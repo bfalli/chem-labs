@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Boyle’s Law Virtual Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e6edf1; --panel:#ffffff; --ink:#12222b; --muted:#566872; --line:#c9d6dd;
+  --teal:#0e6b78; --teal-soft:#d6eaee; --accent:#c2410c; --warn:#9a5b00; --warn-bg:#fff1d6;
+  --glass:rgba(110,165,185,.16); --glass-line:#6c93a4; --rubber:#1f2d35; --rod:#8da1ad;
+  --particle:#0e6b78; --grid:#e1e9ee; --axis:#566872; --screen:#0d1b21; --screen-ink:#9be7d6;
+  --focus:#1d63d1; --sensor:#0e6b78; --sensor-ink:#e8f6f8;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d171c; --panel:#16232a; --ink:#e3edf1; --muted:#9db0b9; --line:#2b3d46;
+    --teal:#56b9c6; --teal-soft:#1c3a42; --accent:#ff9a62; --warn:#ffcf7a; --warn-bg:#3a2d12;
+    --glass:rgba(110,170,190,.14); --glass-line:#5f8798; --rubber:#05090b; --rod:#6f838f;
+    --particle:#6fd0dc; --grid:#223239; --axis:#9db0b9; --screen:#071014; --screen-ink:#9be7d6;
+    --focus:#7fb0ff; --sensor:#1d7f8d; --sensor-ink:#e8f6f8; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d171c; --panel:#16232a; --ink:#e3edf1; --muted:#9db0b9; --line:#2b3d46;
+  --teal:#56b9c6; --teal-soft:#1c3a42; --accent:#ff9a62; --warn:#ffcf7a; --warn-bg:#3a2d12;
+  --glass:rgba(110,170,190,.14); --glass-line:#5f8798; --rubber:#05090b; --rod:#6f838f;
+  --particle:#6fd0dc; --grid:#223239; --axis:#9db0b9; --screen:#071014; --screen-ink:#9be7d6;
+  --focus:#7fb0ff; --sensor:#1d7f8d; --sensor-ink:#e8f6f8; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:18px 16px 40px}
+header h1{margin:0 0 4px;font-size:1.7rem;line-height:1.2;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);max-width:70ch}
+.cols{display:grid;gap:16px;margin-top:16px}
+@media (min-width:980px){.cols{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);align-items:start}}
+.stack{display:grid;gap:16px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h2{margin:0 0 8px;font-size:1.1rem}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 12px;cursor:pointer;min-height:38px}
+button:hover{border-color:var(--teal)}
+button.primary{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+:root[data-theme="dark"] button.primary{color:#04181c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) button.primary{color:#04181c}}
+button[aria-pressed="true"]{background:var(--teal-soft);border-color:var(--teal);font-weight:700}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,canvas:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+input[type=number],select,textarea{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 8px}
+input[type=number]{width:6.5rem}
+.readouts{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-bottom:10px}
+.screen{background:var(--screen);color:var(--screen-ink);border-radius:8px;padding:8px 12px}
+.screen .lab{font-size:.85rem;opacity:.8}
+.screen .val{font-size:2.1rem;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums;min-width:5ch}
+.screen .unit{font-size:1rem;font-weight:400;margin-left:4px}
+.status{font-size:.85rem;display:flex;align-items:center;gap:6px;margin-top:2px}
+.dot{width:10px;height:10px;border-radius:50%;background:#e0a526;display:inline-block}
+.dot.ok{background:#3fcf9a}
+#bench{width:100%;display:block;aspect-ratio:760/220;touch-action:none;cursor:default}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-top:8px}
+.ctl label{display:flex;align-items:center;gap:8px}
+input[type=range]{flex:1 1 180px;min-width:140px;accent-color:var(--teal);height:28px}
+.keep{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.keep .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.msg{min-height:1.4em;margin:6px 0 0;font-size:.92rem}
+.msg.warn{color:var(--warn)}
+table{border-collapse:collapse;width:100%}
+th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-size:.92rem;font-weight:700;vertical-align:bottom}
+td.flag{background:var(--warn-bg);color:var(--warn)}
+td .del{min-height:30px;padding:0 8px;border-color:transparent;background:transparent;color:var(--muted)}
+td .del:hover{color:var(--accent);border-color:var(--line)}
+.empty{padding:14px 4px;color:var(--muted)}
+.stats{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:10px;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+#graph{width:100%;display:block;aspect-ratio:560/360;touch-action:pan-y}
+.fitbox{margin-top:8px;font-variant-numeric:tabular-nums;min-height:3.2em}
+ol.q{padding-left:1.3rem;margin:0;display:grid;gap:14px}
+ol.q li::marker{font-weight:700;color:var(--teal)}
+ol.q textarea{display:block;width:100%;margin-top:6px;min-height:64px;resize:vertical}
+details{margin-top:12px}
+summary{cursor:pointer;font-weight:700;padding:4px 0}
+.steps{margin:6px 0 0;padding-left:1.3rem}
+.steps li{margin:4px 0}
+.opts{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:8px}
+.opts label{display:flex;align-items:center;gap:8px}
+.note{background:var(--teal-soft);border-radius:8px;padding:8px 12px;margin-top:10px;font-size:.92rem}
+@media (max-width:520px){.readouts{grid-template-columns:1fr}.screen .val{font-size:1.8rem}header h1{font-size:1.4rem}}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Boyle’s Law: pressure–volume lab</h1>
+  <p>A syringe of air is sealed to a gas pressure sensor at room temperature. Move the plunger, record the pressure at each volume, and find the pattern.</p>
+</header>
+
+<div class="cols">
+  <div class="stack">
+    <section class="card" aria-labelledby="h-bench">
+      <h2 id="h-bench">Lab bench</h2>
+      <div class="readouts">
+        <div class="screen">
+          <div class="lab">Gas pressure sensor</div>
+          <div><span class="val" id="pRead">1.000</span><span class="unit">atm</span></div>
+          <div class="status"><span class="dot" id="dot"></span><span id="steadyTxt">Settling</span></div>
+        </div>
+        <div class="screen">
+          <div class="lab">Syringe scale reading</div>
+          <div><span class="val" id="vRead">10.0</span><span class="unit">mL</span></div>
+          <div class="status muted" style="color:inherit;opacity:.8">Room temperature, 22.0 °C</div>
+        </div>
+      </div>
+
+      <canvas id="bench" tabindex="-1" role="img" aria-label="Syringe attached to a gas pressure sensor. Drag the plunger to change the volume of trapped air."></canvas>
+      <p class="small muted" style="margin:6px 0 0">Drag the plunger, or use the slider. Line up the front edge of the black rubber seal with the scale.</p>
+
+      <div class="ctl">
+        <button type="button" id="minus" aria-label="Decrease syringe volume by 0.5 mL">−0.5 mL</button>
+        <input type="range" id="slider" min="5" max="20" step="0.1" value="10" aria-label="Syringe volume reading in milliliters">
+        <button type="button" id="plus" aria-label="Increase syringe volume by 0.5 mL">+0.5 mL</button>
+        <label>Set to <input type="number" id="vSet" min="5" max="20" step="0.1" value="10.0" aria-label="Set syringe reading in milliliters"> mL</label>
+      </div>
+
+      <div class="keep">
+        <div class="row">
+          <label for="vIn"><strong>Volume of gas to record</strong></label>
+          <input type="number" id="vIn" step="0.1" min="0" placeholder="mL" inputmode="decimal">
+          <button type="button" class="primary" id="keep">Keep point</button>
+        </div>
+        <p class="msg" id="keepMsg" role="status" aria-live="polite"></p>
+        <div class="note">Hold the plunger still until the sensor reads <em>Steady</em>, then keep the point. The syringe scale is not the whole story: some air is also inside the sensor, so work out the real gas volume before you type it in.</div>
+      </div>
+
+      <details open>
+        <summary>Procedure</summary>
+        <ol class="steps">
+          <li>Start with the syringe reading at 10.0 mL (it is already set). The air is now sealed in.</li>
+          <li>Move the plunger to 5.0 mL and wait for a steady pressure.</li>
+          <li>Enter the total gas volume, then press Keep point.</li>
+          <li>Repeat at 10.0, 12.5, 15.0, 17.5, and 20.0 mL.</li>
+          <li>Draw your graph on your lab report. Press Show curve fit and record the equation and R² with it, then answer the questions.</li>
+        </ol>
+      </details>
+
+      <details>
+        <summary>Teacher options</summary>
+        <div class="opts">
+          <button type="button" id="newSession">New session (new data set)</button>
+          <button type="button" id="clearData">Clear data</button>
+          <label>Sensor noise
+            <select id="noise">
+              <option value="0">None</option>
+              <option value="0.0005">Low</option>
+              <option value="0.0012" selected>Realistic</option>
+              <option value="0.003">High</option>
+            </select>
+          </label>
+          <label><input type="checkbox" id="showParts" checked> Show gas particles</label>
+          <label><input type="checkbox" id="animParts"> Animate particles</label>
+          <label><input type="checkbox" id="flagChk" checked> Flag volumes that skip the sensor correction</label>
+        </div>
+        <p class="small muted" style="margin:8px 0 0">Each new session uses a slightly different room pressure, so no two students get identical numbers.</p>
+      </details>
+    </section>
+
+    <section class="card" aria-labelledby="h-data">
+      <h2 id="h-data">Data table</h2>
+      <div id="tableWrap"></div>
+      <div class="ctl">
+        <button type="button" id="copy">Copy table</button>
+        <span class="small muted" id="copyMsg" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+  </div>
+
+  <div class="stack">
+    <section class="card" aria-labelledby="h-graph">
+      <h2 id="h-graph">Check your graph</h2>
+      <p class="small muted" style="margin:0 0 8px">Draw your own pressure vs. volume graph on your lab report, then use this plot to check it. Record the equation and R² with your graph.</p>
+      <div class="tabs">
+        <button type="button" id="fitBtn" aria-pressed="false">Show curve fit</button>
+      </div>
+      <canvas id="graph" role="img" aria-label="Graph of pressure versus volume for the points you have kept."></canvas>
+      <div class="fitbox" id="fitBox" aria-live="polite">Keep at least three points to fit a curve.</div>
+      <p class="small muted" style="margin:6px 0 0" id="hoverRead">Move over the graph with the curve fit on to read values from the fit line.</p>
+    </section>
+
+    <section class="card" aria-labelledby="h-q">
+      <h2 id="h-q">Questions</h2>
+      <ol class="q">
+        <li>Before collecting data: predict what happens to the pressure if you squeeze the air into half the volume. Explain it using what gas particles are doing.<textarea aria-label="Answer to question 1"></textarea></li>
+        <li>Is the relationship direct or inverse? Defend your choice using the shape of your pressure vs. volume graph and the exponent <em>b</em> in your power fit.<textarea aria-label="Answer to question 2"></textarea></li>
+        <li>Pick two data points where one gas volume is about double the other. Compare their pressures and show the numbers.<textarea aria-label="Answer to question 3"></textarea></li>
+        <li>Which factors must stay constant for your results to hold?<textarea aria-label="Answer to question 4"></textarea></li>
+        <li>Your syringe cannot be set to every volume. Use your fit equation to predict the pressure when the gas volume is 40.0 mL, and again when it is 2.5 mL. Show your work. Which prediction would you trust less, and why?<textarea aria-label="Answer to question 5"></textarea></li>
+        <li>The pattern you found holds for any trapped gas at constant temperature, not just a syringe. A free diver fills her lungs with 6.0 L of air at the surface, where the pressure is 1.0 atm. She dives until the pressure on her lungs is 4.0 atm, far more than your syringe ever reached. (a) What volume do her lungs now hold? Show your work. (b) What would happen to the air in her lungs if she held her breath while swimming back up to the surface?<textarea aria-label="Answer to question 6"></textarea></li>
+      </ol>
+    </section>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $ = function(s){return document.querySelector(s)};
+var LW=760, LH=220, PPM=15, XZ=142, GX0=130, BY0=62, BY1=158, MIN_V=5, MAX_V=20, DEAD=0.8, START_V=10;
+var GW=560, GH=360;
+var patm, vs=START_V, pDisp, pShown, rows=[], tab="pv", fitOn=false, noiseSD=0.0012, flagCheck=true;
+var showParts=true, animParts=!window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+$("#animParts").checked=animParts;
+var hoverX=null;
+
+function K(){return patm*(START_V+DEAD)}
+function trueP(v){return K()/(v+DEAD)}
+function pistonX(){return XZ+vs*PPM}
+function fmt(n,d){return Number(n).toFixed(d)}
+function gauss(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+/* ---------- state ---------- */
+function newSession(){
+  patm=Math.round((0.972+Math.random()*0.05)*1000)/1000;
+  vs=START_V; pDisp=trueP(vs); pShown=Math.round((pDisp+gauss()*noiseSD)*1000)/1000;
+  rows=[]; fitOn=false; $("#fitBtn").setAttribute("aria-pressed","false");
+  initParts(); syncV(); renderTable(); drawGraph(); updateReadout();
+  $("#keepMsg").textContent=""; $("#keepMsg").className="msg";
+}
+function setVs(v){
+  v=Math.max(MIN_V,Math.min(MAX_V,Math.round(v*10)/10));
+  vs=v; syncV();
+}
+function syncV(){
+  $("#slider").value=vs; $("#vSet").value=fmt(vs,1); $("#vRead").textContent=fmt(vs,1);
+}
+function updateReadout(){
+  $("#pRead").textContent=fmt(pShown,3);
+  var steady=Math.abs(trueP(vs)-pDisp)<0.0025;
+  $("#dot").className="dot"+(steady?" ok":"");
+  $("#steadyTxt").textContent=steady?"Steady":"Settling";
+}
+
+/* ---------- particles ---------- */
+var N=60, parts=[], SPEED=105;
+function initParts(){
+  parts=[]; var x1=pistonX();
+  for(var i=0;i<N;i++){
+    var a=Math.random()*Math.PI*2;
+    parts.push({x:GX0+6+Math.random()*(x1-GX0-12),y:BY0+6+Math.random()*(BY1-BY0-12),vx:Math.cos(a)*SPEED,vy:Math.sin(a)*SPEED});
+  }
+}
+function stepParts(dt){
+  var x0=GX0+4,x1=pistonX()-4,y0=BY0+4,y1=BY1-4;
+  for(var i=0;i<parts.length;i++){
+    var p=parts[i];
+    p.x+=p.vx*dt; p.y+=p.vy*dt;
+    if(p.x<x0){p.x=x0+(x0-p.x);p.vx=Math.abs(p.vx)}
+    if(p.x>x1){p.x=x1-(p.x-x1);p.vx=-Math.abs(p.vx)}
+    if(p.x<x0)p.x=x0;
+    if(p.y<y0){p.y=y0+(y0-p.y);p.vy=Math.abs(p.vy)}
+    if(p.y>y1){p.y=y1-(p.y-y1);p.vy=-Math.abs(p.vy)}
+  }
+}
+
+/* ---------- canvas helpers ---------- */
+function setup(c,lw,lh){
+  var dpr=window.devicePixelRatio||1, w=c.clientWidth||lw;
+  var key=w+"x"+dpr;
+  if(c._key!==key){c.width=Math.round(w*dpr);c.height=Math.round(w*lh/lw*dpr);c._key=key}
+  var ctx=c.getContext("2d"), s=w/lw;
+  ctx.setTransform(s*dpr,0,0,s*dpr,0,0);
+  return ctx;
+}
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+var FONT='"Atkinson Hyperlegible",system-ui,sans-serif';
+
+/* ---------- apparatus ---------- */
+var bc=$("#bench");
+function drawBench(){
+  var ctx=setup(bc,LW,LH); ctx.clearRect(0,0,LW,LH);
+  var px=pistonX();
+  var ink=css("--ink"),muted=css("--muted");
+  // sensor body
+  ctx.fillStyle=css("--sensor"); rr(ctx,8,48,112,124,10); ctx.fill();
+  ctx.fillStyle=css("--sensor-ink"); ctx.font="700 13px "+FONT; ctx.textAlign="left";
+  ctx.fillText("Go Direct",22,80); ctx.fillText("Gas Pressure",22,98);
+  ctx.globalAlpha=.55; ctx.fillRect(22,112,84,3); ctx.fillRect(22,122,60,3); ctx.globalAlpha=1;
+  // barrel glass
+  ctx.fillStyle=css("--glass"); rr(ctx,GX0,BY0,XZ+MAX_V*PPM-GX0+6,BY1-BY0,6); ctx.fill();
+  ctx.strokeStyle=css("--glass-line"); ctx.lineWidth=2; ctx.stroke();
+  // particles
+  if(showParts){
+    ctx.fillStyle=css("--particle");
+    for(var i=0;i<parts.length;i++){ctx.beginPath();ctx.arc(parts[i].x,parts[i].y,3.2,0,6.2832);ctx.fill()}
+  }
+  // scale ticks
+  ctx.strokeStyle=css("--glass-line"); ctx.fillStyle=muted; ctx.lineWidth=1.2; ctx.textAlign="center"; ctx.font="12px "+FONT;
+  for(var t=0;t<=40;t++){
+    var v=t/2, x=XZ+v*PPM, len=(v%5===0)?16:(v%1===0)?11:6;
+    ctx.beginPath();ctx.moveTo(x,BY1);ctx.lineTo(x,BY1-len);ctx.stroke();
+    if(v%5===0&&v>0){ctx.fillText(String(v),x,BY1+16)}
+  }
+  ctx.fillText("mL",XZ+MAX_V*PPM+16,BY1+16);
+  // dead volume bracket
+  ctx.strokeStyle=muted; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(GX0,BY1+24);ctx.lineTo(GX0,BY1+30);ctx.lineTo(XZ,BY1+30);ctx.lineTo(XZ,BY1+24);ctx.stroke();
+  ctx.fillStyle=muted; ctx.textAlign="left"; ctx.font="12px "+FONT;
+  ctx.fillText("0.8 mL of air inside the sensor",GX0-2,BY1+46);
+  // piston
+  ctx.fillStyle=css("--rod"); ctx.fillRect(px,103,280,14);
+  ctx.fillStyle=css("--rubber"); rr(ctx,px-16,BY0+2,16,BY1-BY0-4,3); ctx.fill();
+  ctx.fillStyle=css("--rod"); rr(ctx,px+280,76,10,68,4); ctx.fill();
+  // reading marker
+  ctx.strokeStyle=css("--accent"); ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(px,BY0-14);ctx.lineTo(px,BY0+2);ctx.stroke();
+  ctx.fillStyle=css("--accent"); ctx.textAlign="center"; ctx.font="700 13px "+FONT;
+  ctx.fillText("front edge of seal",Math.max(70,Math.min(LW-70,px)),BY0-20);
+}
+
+/* ---------- data table ---------- */
+function renderTable(){
+  var w=$("#tableWrap");
+  if(!rows.length){
+    w.innerHTML='<div class="empty">No points yet. Move the plunger, wait for a steady pressure, then press Keep point.</div>';
+    return;
+  }
+  var h='<table><thead><tr><th scope="col">#</th><th scope="col">Syringe reading (mL)</th><th scope="col">Gas volume (mL)</th><th scope="col">Pressure (atm)</th><th scope="col"><span style="position:absolute;left:-9999px">Remove</span></th></tr></thead><tbody>';
+  rows.forEach(function(r,i){
+    h+='<tr><td>'+(i+1)+'</td><td>'+fmt(r.s,1)+'</td><td'+(r.flag?' class="flag" title="This volume does not match the syringe reading plus the air inside the sensor."':'')+'>'+fmt(r.v,1)+(r.flag?' (check)':'')+'</td><td>'+fmt(r.p,3)+'</td><td><button type="button" class="del" data-i="'+i+'" aria-label="Remove point '+(i+1)+'">✕</button></td></tr>';
+  });
+  h+='</tbody></table>';
+  w.innerHTML=h;
+}
+$("#tableWrap").addEventListener("click",function(e){
+  var b=e.target.closest(".del"); if(!b)return;
+  rows.splice(+b.dataset.i,1); renderTable(); drawGraph();
+});
+
+function keepPoint(){
+  var raw=$("#vIn").value, v=parseFloat(raw), m=$("#keepMsg");
+  if(!raw||isNaN(v)||v<=0){m.textContent="Type the gas volume in mL first.";m.className="msg warn";return}
+  v=Math.round(v*100)/100;
+  var flag=flagCheck&&Math.abs(v-(vs+DEAD))>0.15;
+  rows.push({s:vs,v:v,p:pShown,flag:flag});
+  $("#vIn").value="";
+  if(flag){m.textContent="Point kept, but the volume you typed does not match the gas volume. Check the sensor correction.";m.className="msg warn"}
+  else{m.textContent="Point "+rows.length+" kept: "+fmt(v,1)+" mL at "+fmt(pShown,3)+" atm.";m.className="msg"}
+  renderTable(); drawGraph();
+}
+$("#keep").addEventListener("click",keepPoint);
+$("#vIn").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();keepPoint()}});
+
+/* ---------- fits ---------- */
+function linFit(x,y){
+  var n=x.length,sx=0,sy=0,sxx=0,sxy=0,i;
+  for(i=0;i<n;i++){sx+=x[i];sy+=y[i];sxx+=x[i]*x[i];sxy+=x[i]*y[i]}
+  var m=(n*sxy-sx*sy)/(n*sxx-sx*sx), b=(sy-m*sx)/n, my=sy/n, sst=0, sse=0;
+  for(i=0;i<n;i++){sst+=Math.pow(y[i]-my,2);sse+=Math.pow(y[i]-(m*x[i]+b),2)}
+  return {m:m,b:b,r2:sst?1-sse/sst:1};
+}
+function powerFit(x,y){
+  var n=x.length,i;
+  function aFor(b){var sxy=0,sxx=0;for(i=0;i<n;i++){var t=Math.pow(x[i],b);sxy+=y[i]*t;sxx+=t*t}return sxy/sxx}
+  function sse(b){var a=aFor(b),s=0;for(i=0;i<n;i++){var e=y[i]-a*Math.pow(x[i],b);s+=e*e}return s}
+  var lo=-4,hi=4;
+  for(var it=0;it<90;it++){var m1=lo+(hi-lo)/3,m2=hi-(hi-lo)/3;if(sse(m1)<sse(m2))hi=m2;else lo=m1}
+  var b=(lo+hi)/2,a=aFor(b),my=y.reduce(function(s,v){return s+v},0)/n,sst=0;
+  for(i=0;i<n;i++)sst+=Math.pow(y[i]-my,2);
+  return {a:a,b:b,r2:sst?1-sse(b)/sst:1};
+}
+function getFits(){
+  if(rows.length<3)return null;
+  var vv=rows.map(function(r){return r.v}), pp=rows.map(function(r){return r.p});
+  var uniq=vv.filter(function(v,i){return vv.indexOf(v)===i}).length;
+  if(uniq<3)return null;
+  return {pw:powerFit(vv,pp),ln:linFit(vv.map(function(v){return 1/v}),pp)};
+}
+
+/* ---------- graph ---------- */
+var gc=$("#graph");
+function drawGraph(){
+  var ctx=setup(gc,GW,GH); ctx.clearRect(0,0,GW,GH);
+  var cfg=tab==="pv"?{xmax:25,xstep:5,xd:0,xl:"Volume (mL)"}:{xmax:0.2,xstep:0.05,xd:2,xl:"1/Volume (1/mL)"};
+  var ymax=2,ystep=0.25, L=64,R=16,T=14,B=52, pw=GW-L-R, ph=GH-T-B;
+  function X(v){return L+v/cfg.xmax*pw}
+  function Y(v){return T+ph-v/ymax*ph}
+  var axis=css("--axis"),grid=css("--grid"),ink=css("--ink");
+  ctx.lineWidth=1; ctx.font="13px "+FONT; ctx.fillStyle=axis; ctx.strokeStyle=grid;
+  var v;
+  ctx.textAlign="center";
+  for(v=0;v<=cfg.xmax+1e-9;v+=cfg.xstep){ctx.beginPath();ctx.moveTo(X(v),T);ctx.lineTo(X(v),T+ph);ctx.stroke();ctx.fillText(fmt(v,cfg.xd),X(v),T+ph+18)}
+  ctx.textAlign="right";
+  for(v=0;v<=ymax;v+=ystep){ctx.beginPath();ctx.moveTo(L,Y(v));ctx.lineTo(L+pw,Y(v));ctx.stroke();ctx.fillText(fmt(v,2),L-8,Y(v)+4)}
+  ctx.strokeStyle=axis; ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(L,T);ctx.lineTo(L,T+ph);ctx.lineTo(L+pw,T+ph);ctx.stroke();
+  ctx.fillStyle=ink; ctx.font="700 14px "+FONT; ctx.textAlign="center";
+  ctx.fillText(cfg.xl,L+pw/2,GH-10);
+  ctx.save();ctx.translate(16,T+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText("Pressure (atm)",0,0);ctx.restore();
+
+  var fits=getFits(), fitTxt="";
+  if(fitOn&&fits){
+    ctx.strokeStyle=css("--teal"); ctx.lineWidth=2.5; ctx.beginPath();
+    if(tab==="pv"){
+      for(var i=0;i<=120;i++){var x=0.4+(cfg.xmax-0.4)*i/120,y=fits.pw.a*Math.pow(x,fits.pw.b);if(y>ymax*1.2){continue}
+        if(i===0)ctx.moveTo(X(x),Y(y));else ctx.lineTo(X(x),Y(Math.min(y,ymax*1.2)))}
+    }else{
+      ctx.moveTo(X(0),Y(Math.max(0,fits.ln.b)));ctx.lineTo(X(cfg.xmax),Y(fits.ln.m*cfg.xmax+fits.ln.b));
+    }
+    ctx.save();ctx.beginPath();ctx.rect(L,T,pw,ph);ctx.clip();ctx.stroke();ctx.restore();
+  }
+  // points
+  ctx.fillStyle=css("--accent");
+  rows.forEach(function(r){
+    var x=tab==="pv"?r.v:1/r.v;
+    ctx.beginPath();ctx.arc(X(x),Y(r.p),5.5,0,6.2832);ctx.fill();
+    ctx.strokeStyle=css("--panel");ctx.lineWidth=1.5;ctx.stroke();
+  });
+  // hover
+  var hr=$("#hoverRead");
+  if(fitOn&&fits&&hoverX!==null){
+    var hx=Math.max(0,Math.min(cfg.xmax,hoverX)), hy;
+    if(tab==="pv"){hy=fits.pw.a*Math.pow(Math.max(hx,0.01),fits.pw.b)}else{hy=fits.ln.m*hx+fits.ln.b}
+    if(hy>=0&&hy<=ymax){
+      ctx.strokeStyle=ink;ctx.lineWidth=1;ctx.setLineDash([4,4]);
+      ctx.beginPath();ctx.moveTo(X(hx),T+ph);ctx.lineTo(X(hx),Y(hy));ctx.lineTo(L,Y(hy));ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle=css("--teal");ctx.beginPath();ctx.arc(X(hx),Y(hy),5,0,6.2832);ctx.fill();
+      hr.textContent=tab==="pv"?"Fit line at V = "+fmt(hx,1)+" mL: P = "+fmt(hy,3)+" atm":"Fit line at 1/V = "+fmt(hx,3)+" 1/mL (V = "+(hx>0?fmt(1/hx,1):"∞")+" mL): P = "+fmt(hy,3)+" atm";
+    }
+  }else if(!(fitOn&&fits)){hr.textContent="Move over the graph with the curve fit on to read values from the fit line."}
+  // fit text
+  var fb=$("#fitBox");
+  if(!fits){fb.textContent="Keep at least three points, at three different volumes, to fit a curve."}
+  else if(!fitOn){fb.textContent="Press Show curve fit to compare a model with your data."}
+  else if(tab==="pv"){
+    fb.innerHTML="Power fit: <strong>P = a·V<sup>b</sup></strong><br>a = "+fmt(fits.pw.a,2)+", b = "+fmt(fits.pw.b,3)+", R² = "+fmt(fits.pw.r2,4);
+  }else{
+    fb.innerHTML="Linear fit: <strong>P = m·(1/V) + b</strong><br>m = "+fmt(fits.ln.m,2)+" atm·mL, b = "+fmt(fits.ln.b,3)+" atm, R² = "+fmt(fits.ln.r2,4);
+  }
+}
+$("#fitBtn").addEventListener("click",function(){
+  fitOn=!fitOn; this.setAttribute("aria-pressed",fitOn); hoverX=null; drawGraph();
+});
+function graphMove(e){
+  var r=gc.getBoundingClientRect(), lx=(e.clientX-r.left)*GW/r.width;
+  var L=64,R=16,pw=GW-L-R, xmax=tab==="pv"?25:0.2;
+  hoverX=(lx-L)/pw*xmax; drawGraph();
+}
+gc.addEventListener("pointermove",graphMove);
+gc.addEventListener("pointerleave",function(){hoverX=null;drawGraph()});
+
+/* ---------- bench interaction ---------- */
+var drag=null;
+function lp(e){var r=bc.getBoundingClientRect();return{x:(e.clientX-r.left)*LW/r.width,y:(e.clientY-r.top)*LH/r.height}}
+function onPlunger(p){var px=pistonX();return p.x>=px-18&&p.x<=px+292&&p.y>=70&&p.y<=150}
+bc.addEventListener("pointerdown",function(e){
+  var p=lp(e); if(!onPlunger(p))return;
+  drag={off:p.x-pistonX()}; bc.setPointerCapture(e.pointerId); bc.style.cursor="grabbing"; e.preventDefault();
+});
+bc.addEventListener("pointermove",function(e){
+  var p=lp(e);
+  if(drag){setVs(((p.x-drag.off)-XZ)/PPM)}
+  else bc.style.cursor=onPlunger(p)?"grab":"default";
+});
+function endDrag(){drag=null;bc.style.cursor="default"}
+bc.addEventListener("pointerup",endDrag);
+bc.addEventListener("pointercancel",endDrag);
+
+$("#slider").addEventListener("input",function(){setVs(parseFloat(this.value))});
+$("#vSet").addEventListener("change",function(){var v=parseFloat(this.value);if(!isNaN(v))setVs(v);else syncV()});
+$("#minus").addEventListener("click",function(){setVs(vs-0.5)});
+$("#plus").addEventListener("click",function(){setVs(vs+0.5)});
+
+/* ---------- teacher options ---------- */
+$("#newSession").addEventListener("click",newSession);
+$("#clearData").addEventListener("click",function(){rows=[];renderTable();drawGraph();$("#keepMsg").textContent="Data cleared.";$("#keepMsg").className="msg"});
+$("#noise").addEventListener("change",function(){noiseSD=parseFloat(this.value)});
+$("#showParts").addEventListener("change",function(){showParts=this.checked});
+$("#animParts").addEventListener("change",function(){animParts=this.checked});
+$("#flagChk").addEventListener("change",function(){flagCheck=this.checked});
+$("#copy").addEventListener("click",function(){
+  var m=$("#copyMsg");
+  if(!rows.length){m.textContent="Nothing to copy yet.";return}
+  var txt="Syringe reading (mL)\tGas volume (mL)\tPressure (atm)\n"+rows.map(function(r){return fmt(r.s,1)+"\t"+fmt(r.v,1)+"\t"+fmt(r.p,3)}).join("\n");
+  try{
+    navigator.clipboard.writeText(txt).then(function(){m.textContent="Copied."},function(){m.textContent="Copy was blocked. Select the table and copy it by hand."});
+  }catch(err){m.textContent="Copy was blocked. Select the table and copy it by hand."}
+});
+
+/* ---------- main loop ---------- */
+var last=performance.now(), noiseT=0;
+function frame(now){
+  var dt=Math.min(0.05,(now-last)/1000); last=now;
+  // sensor settling toward true pressure
+  var target=trueP(vs);
+  pDisp+=(target-pDisp)*(1-Math.exp(-dt/0.45));
+  noiseT+=dt;
+  if(noiseT>0.2){noiseT=0;pShown=Math.round((pDisp+gauss()*noiseSD)*1000)/1000;updateReadout()}
+  if(animParts)stepParts(dt);
+  else{ // keep static particles inside the gas region
+    var x1=pistonX()-4;for(var i=0;i<parts.length;i++){if(parts[i].x>x1)parts[i].x=x1-Math.random()*20}
+  }
+  drawBench();
+  requestAnimationFrame(frame);
+}
+window.addEventListener("resize",function(){drawGraph()});
+if(window.matchMedia){
+  var mq=window.matchMedia("(prefers-color-scheme: dark)");
+  var rd=function(){drawGraph()};
+  if(mq.addEventListener)mq.addEventListener("change",rd);
+}
+
+newSession();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

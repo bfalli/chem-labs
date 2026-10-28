@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Activity of the Nonmetals: Virtual Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e6edf1; --panel:#ffffff; --ink:#12222b; --muted:#566872; --line:#c9d6dd;
+  --teal:#0e6b78; --teal-soft:#d6eaee; --accent:#c2410c; --warn:#8f5200; --warn-bg:#fff1d6; --ok:#17704a;
+  --bench:#dbe5ea; --glass:#6c93a4; --focus:#1d63d1; --tube-edge:#5f8798;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d171c; --panel:#16232a; --ink:#e3edf1; --muted:#9db0b9; --line:#2b3d46;
+    --teal:#56b9c6; --teal-soft:#1c3a42; --accent:#ff9a62; --warn:#ffcf7a; --warn-bg:#3a2d12; --ok:#6fd8a6;
+    --bench:#1e303a; --glass:#7fa6b7; --focus:#7fb0ff; --tube-edge:#8fb4c4; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d171c; --panel:#16232a; --ink:#e3edf1; --muted:#9db0b9; --line:#2b3d46;
+  --teal:#56b9c6; --teal-soft:#1c3a42; --accent:#ff9a62; --warn:#ffcf7a; --warn-bg:#3a2d12; --ok:#6fd8a6;
+  --bench:#1e303a; --glass:#7fa6b7; --focus:#7fb0ff; --tube-edge:#8fb4c4; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:18px 16px 48px}
+h1{margin:0 0 4px;font-size:1.7rem;line-height:1.2;letter-spacing:-.01em}
+h2{margin:0 0 8px;font-size:1.15rem}
+h3{margin:14px 0 6px;font-size:1rem}
+p{margin:0 0 8px}
+.muted{color:var(--muted)} .small{font-size:.9rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0;margin-top:16px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 12px;cursor:pointer;min-height:38px}
+button:hover{border-color:var(--teal)}
+button[aria-pressed="true"]{background:var(--teal-soft);border-color:var(--teal);font-weight:700}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+input[type=text],select,textarea{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 8px;max-width:100%}
+textarea{display:block;width:100%;min-height:70px;resize:vertical}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.tabs button{font-weight:700}
+.steps{margin:6px 0 0;padding-left:1.3rem}.steps li{margin:5px 0}
+.coach{min-height:2.6em;margin:10px 0 0;padding:8px 12px;border-radius:8px;background:var(--teal-soft);font-size:.95rem}
+.coach.warn{background:var(--warn-bg);color:var(--warn)}
+.bench{background:var(--bench);border-radius:10px;padding:12px;margin-top:10px}
+.shelf{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.bottle{width:96px;min-height:0;padding:4px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;font-size:.8rem;line-height:1.2}
+.bottle svg{width:62px;height:auto;display:block}
+.bottle .nm{font-weight:700}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+.rack{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;align-items:flex-start}
+.tubecol{width:138px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tubecol select{width:100%}
+.tubebox{width:116px;touch-action:none;user-select:none;-webkit-user-select:none}
+.tubebox.armed{cursor:crosshair}
+.tubebox svg{width:100%;height:auto;display:block}
+.cap{font-size:.82rem;text-align:center;min-height:3.9em;color:var(--muted)}
+.cap .bad{color:var(--warn);font-weight:700}
+.tubecol .btns{display:grid;grid-template-columns:1fr;gap:5px;width:100%}
+.tubecol .btns button{min-height:34px;padding:3px 8px;font-size:.9rem}
+.addbtn{background:var(--teal)!important;border-color:var(--teal)!important;color:#fff!important;font-weight:700}
+:root[data-theme="dark"] .addbtn{color:#04181c!important}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .addbtn{color:#04181c!important}}
+.grid2{display:grid;gap:16px}
+@media(min-width:900px){.grid2{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}}
+table{border-collapse:collapse;width:100%}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+td input[type=text]{width:100%}
+.bohr{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.bohr .bm{display:flex;flex-direction:column;align-items:center;gap:2px;border:2px solid var(--line);border-radius:10px;padding:6px;width:150px;text-align:center;font-size:.9rem}
+.bohr label:has(input:checked){border-color:var(--teal);background:var(--teal-soft)}
+.bohr input{position:absolute;opacity:0;pointer-events:none}
+.bohr label:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:2px}
+.bohr svg{width:100%;height:auto}
+.q{margin:14px 0 0}.q label.t{display:block;font-weight:700;margin-bottom:4px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sr{position:absolute;left:-9999px}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>The Activity of the Nonmetals: virtual lab</h1>
+  <p class="muted" style="max-width:72ch">Compare the halogens to find which is most active, and whether nonmetal activity increases up or down the family. Work through both parts here, and record what you see on your lab report.</p>
+</header>
+
+
+<div class="tabs" role="group" aria-label="Choose lab part">
+  <button type="button" id="tab1" aria-pressed="true">Part I: chlorine water</button>
+  <button type="button" id="tab2" aria-pressed="false">Part II: Ca(NO₃)₂</button>
+</div>
+
+<div id="coach" class="coach" role="status" aria-live="polite">Start by putting on your safety goggles. Then click a bottle on the shelf to pick it up.</div>
+
+<!-- PART I -->
+<div id="panel1">
+  <div class="grid2">
+    <section class="card" aria-labelledby="h-p1">
+      <h2 id="h-p1">Part I: reaction with chlorine water</h2>
+      <ol class="steps">
+        <li>Take three clean test tubes. Label them NaF, NaBr, and KI, then add 20 drops of each solution to its tube. Each solution stands in for its halogen.</li>
+        <li>Add 20 drops (1.0 mL) of hexane to each tube. Hexane evaporates fast, so don’t leave it open.</li>
+        <li>Only after the hexane is in, add 5 drops of chlorine water to each tube. Tap the tube to mix, and watch the color in the top layer.</li>
+        <li>Pour each tube into the halogen waste, then rinse it three times.</li>
+      </ol>
+      <h3>How to read the result</h3>
+      <p class="small">This is a replacement reaction. If chlorine is more active than the halogen in the compound, it replaces it, and a color appears in the top layer. <strong>Color</strong> means that halogen is <em>less</em> active than chlorine. <strong>No color</strong> means it is <em>more</em> active.</p>
+    </section>
+    <section class="card" aria-labelledby="h-b1">
+      <h2 id="h-b1">Lab bench</h2>
+      <div class="tools"><button type="button" class="gogglesBtn" aria-pressed="false">🥽 Put on goggles</button><span class="small muted" id="sel1">Nothing selected.</span></div>
+      <div class="bench"><div class="shelf" id="shelf1"></div><div class="rack" id="rack1"></div></div>
+      <div class="row" style="margin-top:10px"><button type="button" class="resetBtn" data-part="1">Start Part I over</button></div>
+    </section>
+  </div>
+
+
+  <section class="card" aria-labelledby="h-bohr">
+    <h2 id="h-bohr">Bohr models for reference</h2>
+    <p class="small muted">You will use these for Question 2 on your lab report.</p>
+    <div class="bohr" id="bohr"></div>
+  </section>
+  <div class="row" style="margin-top:16px"><button type="button" id="go2">Continue to Part II →</button></div>
+</div>
+
+<!-- PART II -->
+<div id="panel2" hidden>
+  <div class="grid2">
+    <section class="card" aria-labelledby="h-p2">
+      <h2 id="h-p2">Part II: reaction with Ca(NO₃)₂</h2>
+      <ol class="steps">
+        <li>Use four clean large test tubes. Label them NaF, NaCl, NaBr, and KI.</li>
+        <li>Measure 5.0 mL of each solution into its tube. The first tube is your guide: use its height to judge 5.0 mL in the other three.</li>
+        <li>Add 10 to 15 drops of 0.1 M Ca(NO₃)₂ to each tube. Record what you see. The reaction may be subtle. If nothing happens, write “NO RXN.”</li>
+        <li>Pour out the tubes, then rinse each one three times.</li>
+      </ol>
+      <p class="small muted" style="margin-top:10px">To pour, pick up a solution bottle, then hold the mouse button (or your finger) down on a tube. Each tick adds 0.1 mL, and the readout under the tube shows the total.</p>
+    </section>
+    <section class="card" aria-labelledby="h-b2">
+      <h2 id="h-b2">Lab bench</h2>
+      <div class="tools"><button type="button" class="gogglesBtn" aria-pressed="false">🥽 Put on goggles</button><span class="small muted" id="sel2">Nothing selected.</span></div>
+      <div class="bench"><div class="shelf" id="shelf2"></div><div class="rack" id="rack2"></div></div>
+      <div class="row" style="margin-top:10px"><button type="button" class="resetBtn" data-part="2">Start Part II over</button></div>
+    </section>
+  </div>
+
+
+</div>
+
+<section class="card" aria-label="Teacher options">
+  <details style="margin-top:14px">
+    <summary style="cursor:pointer;font-weight:700">Teacher options</summary>
+    <div class="row" style="margin-top:10px">
+      <label><input type="checkbox" id="optGoggles" checked> Require goggles before adding anything</label>
+      <label>NaCl tube in Part II
+        <select id="optCl"><option value="key" selected>Small precipitate (matches the lab key)</option><option value="clear">Stays clear (calcium chloride is soluble)</option></select>
+      </label>
+    </div>
+    <h3>Expected results in this simulation</h3>
+    <table>
+      <thead><tr><th scope="col">Tube</th><th scope="col">Part I (hexane + chlorine water)</th><th scope="col">Part II (Ca(NO₃)₂)</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">NaF</th><td>No color</td><td>Large white precipitate</td></tr>
+        <tr><th scope="row">NaCl</th><td>(not used)</td><td>Small precipitate (or clear, per option above)</td></tr>
+        <tr><th scope="row">NaBr</th><td>Orange top layer</td><td>NO RXN</td></tr>
+        <tr><th scope="row">KI</th><td>Purple top layer</td><td>NO RXN</td></tr>
+      </tbody>
+    </table>
+  </details>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var DROP=0.05; // mL per drop
+var SALTS={NaF:"F",NaCl:"Cl",NaBr:"Br",KI:"I"};
+var KIND_AQ={Br:[255,175,45],I:[150,95,35]};
+var KIND_ORG={Br:[255,120,10],I:[140,35,185]};
+var PARTS={
+  1:{cap:4,labels:["NaF","NaBr","KI"],bottles:[
+    {id:"NaF",f:"NaF",name:"Sodium fluoride",unit:"drop",col:[170,210,230]},
+    {id:"NaBr",f:"NaBr",name:"Sodium bromide",unit:"drop",col:[170,210,230]},
+    {id:"KI",f:"KI",name:"Potassium iodide",unit:"drop",col:[170,210,230]},
+    {id:"hex",f:"C₆H₁₄",name:"Hexane (flammable)",unit:"drop",col:[222,230,205]},
+    {id:"cl",f:"Cl₂(aq)",name:"Chlorine water",unit:"drop",col:[215,232,110]}]},
+  2:{cap:10,labels:["NaF","NaCl","NaBr","KI"],bottles:[
+    {id:"NaF",f:"NaF",name:"Sodium fluoride",unit:"pour",col:[170,210,230]},
+    {id:"NaCl",f:"NaCl",name:"Sodium chloride",unit:"pour",col:[170,210,230]},
+    {id:"NaBr",f:"NaBr",name:"Sodium bromide",unit:"pour",col:[170,210,230]},
+    {id:"KI",f:"KI",name:"Potassium iodide",unit:"pour",col:[170,210,230]},
+    {id:"ca",f:"Ca(NO₃)₂",name:"Calcium nitrate, 0.1 M",unit:"drop",col:[185,215,230]}]}
+};
+var tubes={1:[],2:[]}, selected={1:null,2:null}, part=1, goggles=false;
+var opts={goggles:true,cl:"key"};
+
+function newTube(p,i){
+  var sp=[];for(var k=0;k<46;k++)sp.push({x:Math.random(),y:Math.random(),r:1+Math.random()*2.2,s:.01+Math.random()*.02});
+  return {part:p,i:i,label:"",salt:{NaF:0,NaCl:0,NaBr:0,KI:0},hex:0,cl:0,ca:0,exCl:0,state:"clean",dumping:false,dumpT:0,rinseT:-1,
+    hintOrder:false,hintVol:false,drops:[],pour:0,speck:sp,capText:"",
+    v:{ext:0,mix:0,ppt:0,settle:0,fill:1,rot:0,shake:0}};
+}
+function initTubes(p){tubes[p]=[];for(var i=0;i<PARTS[p].labels.length;i++)tubes[p].push(newTube(p,i))}
+
+/* ---------- coach ---------- */
+function coach(msg,warn){var c=$("#coach");c.textContent=msg;c.className="coach"+(warn?" warn":"")}
+
+/* ---------- build UI ---------- */
+function bottleSVG(b){
+  var c="rgb("+b.col.join(",")+")";
+  return '<svg viewBox="0 0 80 112" aria-hidden="true"><rect x="26" y="4" width="28" height="16" rx="6" fill="#26333b"/><rect x="31" y="20" width="18" height="10" fill="'+c+'" stroke="var(--glass)" stroke-width="1.5"/>'+
+  '<rect x="10" y="30" width="60" height="76" rx="12" fill="var(--panel)" stroke="var(--glass)" stroke-width="2"/><rect x="13" y="52" width="54" height="51" rx="9" fill="'+c+'" opacity=".85"/>'+
+  '<rect x="16" y="62" width="48" height="28" rx="3" fill="#fff" stroke="#9aa9b1"/><text x="40" y="81" text-anchor="middle" font-size="'+(b.f.length>6?10:13)+'" font-weight="700" fill="#12222b" font-family="Atkinson Hyperlegible,system-ui,sans-serif">'+b.f+'</text></svg>';
+}
+function build(p){
+  var cfg=PARTS[p], sh=$("#shelf"+p), rk=$("#rack"+p);
+  sh.innerHTML="";rk.innerHTML="";
+  cfg.bottles.forEach(function(b){
+    var el=document.createElement("button");el.type="button";el.className="bottle";el.setAttribute("aria-pressed","false");el.dataset.id=b.id;
+    el.innerHTML=bottleSVG(b)+'<span class="nm">'+b.f+'</span><span>'+b.name+'</span>';
+    el.addEventListener("click",function(){selectBottle(p,b.id)});
+    sh.appendChild(el);
+  });
+  tubes[p].forEach(function(t,i){
+    var col=document.createElement("div");col.className="tubecol";
+    var opts2='<option value="">Label: none</option>'+cfg.labels.map(function(l){return '<option>'+l+'</option>'}).join("");
+    col.innerHTML='<select aria-label="Label for tube '+(i+1)+'">'+opts2+'</select>'+
+      '<div class="tubebox" id="tb'+p+'_'+i+'" role="img" aria-label="Test tube '+(i+1)+'"></div>'+
+      '<div class="cap" id="cp'+p+'_'+i+'"></div>'+
+      '<div class="btns"><button type="button" class="addbtn">Add selected</button><button type="button" class="tapbtn">Tap to mix</button><button type="button" class="dumpbtn">Pour into waste</button><button type="button" class="rinsebtn">Rinse 3×</button></div>';
+    rk.appendChild(col);
+    $("select",col).addEventListener("change",function(){t.label=this.value;if(t.label)coach("Tube "+(i+1)+" is labeled "+t.label+".")});
+    bindHold($(".tubebox",col),p,i);bindHold($(".addbtn",col),p,i);
+    $(".tapbtn",col).addEventListener("click",function(){tap(t)});
+    $(".dumpbtn",col).addEventListener("click",function(){dump(t)});
+    $(".rinsebtn",col).addEventListener("click",function(){rinse(t)});
+    t.sel=$("select",col);
+  });
+  updateArmed(p);
+}
+function selectBottle(p,id){
+  selected[p]=(selected[p]===id)?null:id;
+  $$("#shelf"+p+" .bottle").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.id===selected[p]))});
+  var b=selected[p]&&PARTS[p].bottles.filter(function(x){return x.id===selected[p]})[0];
+  $("#sel"+p).textContent=b?("Holding: "+b.name+". "+(b.unit==="pour"?"Hold down on a tube to pour.":"Click a tube once per drop, or hold to keep dropping.")):"Nothing selected.";
+  updateArmed(p);
+}
+function updateArmed(p){$$("#rack"+p+" .tubebox").forEach(function(e){e.classList.toggle("armed",!!selected[p])})}
+
+/* ---------- actions ---------- */
+function bottleFor(p){return PARTS[p].bottles.filter(function(x){return x.id===selected[p]})[0]}
+function total(t){return t.salt.NaF+t.salt.NaCl+t.salt.NaBr+t.salt.KI}
+function mainSalt(t){var m=null,mx=0;for(var k in t.salt){if(t.salt[k]>mx+1e-9){mx=t.salt[k];m=k}}return m}
+function dispense(p,i){
+  var t=tubes[p][i];
+  if(opts.goggles&&!goggles){coach("Put on your safety goggles first.",true);return false}
+  var b=bottleFor(p);
+  if(!b){coach("Click a bottle on the shelf first, then add it to a tube.",true);return false}
+  if(t.dumping||t.rinseT>=0)return false;
+  if(t.state==="dirty"){coach("Rinse that tube three times before you use it again.",true);return false}
+  var amt=b.unit==="pour"?0.1:DROP;
+  var cap=PARTS[p].cap;
+  if(total(t)+t.hex+t.cl+t.ca+amt>cap*0.93){coach("That tube is full.",true);return false}
+  if(SALTS[b.id]){
+    var m=mainSalt(t);
+    if(m&&m!==b.id&&t.salt[m]>0.049&&!t["warn"+b.id]){t["warn"+b.id]=true;coach("Tube "+(i+1)+" already has "+m+" in it. Mixing solutions will confuse your results.",true)}
+    t.salt[b.id]+=amt;
+  }else if(b.id==="hex")t.hex+=amt;
+  else if(b.id==="cl"){
+    t.cl+=amt;
+    if(t.hex<0.049&&!t.hintOrder){t.hintOrder=true;coach("Add the hexane before the chlorine water. The hexane layer is where the color will show up.",true)}
+  }else if(b.id==="ca"){
+    t.ca+=amt;
+    var s=total(t);
+    if(!t.hintVol&&(s<4.4||s>5.6)){t.hintVol=true;coach("Your solution volume isn’t close to 5.0 mL. Compare it with your first tube.",true)}
+  }
+  if(b.unit==="drop")t.drops.push({y:10,x:44+Math.random()*12,c:b.col});else t.pour=0.25;t.pourCol=b.col;
+  return true;
+}
+function bindHold(el,p,i){
+  var to=null,iv=null;
+  function stop(){clearTimeout(to);clearInterval(iv);to=iv=null}
+  el.addEventListener("pointerdown",function(e){
+    if(e.button>0)return;e.preventDefault();
+    if(!dispense(p,i))return;
+    var b=bottleFor(p),rate=b&&b.unit==="pour"?90:160;
+    to=setTimeout(function(){iv=setInterval(function(){if(!dispense(p,i))stop()},rate)},320);
+  });
+  ["pointerup","pointerleave","pointercancel"].forEach(function(ev){el.addEventListener(ev,stop)});
+  if(el.tagName==="BUTTON")el.addEventListener("click",function(e){if(e.detail===0)dispense(p,i)});
+}
+function tap(t){
+  if(t.dumping||t.rinseT>=0)return;
+  if(total(t)+t.hex+t.cl+t.ca<0.02){coach("Nothing in that tube to mix yet.",true);return}
+  t.v.shake=1;
+  if(t.hex>0.049&&t.cl>0)t.exCl=t.cl;
+  else if(t.cl>0&&t.hex<0.049)coach("There is no hexane layer in that tube, so there is nowhere for the color to move to.",true);
+}
+function dump(t){
+  if(t.dumping||t.rinseT>=0)return;
+  if(total(t)+t.hex+t.cl+t.ca<0.01){coach("That tube is already empty.");return}
+  t.dumping=true;t.dumpT=0;coach("Pouring into the halogen waste container.");
+}
+function rinse(t){
+  if(t.dumping||t.rinseT>=0)return;
+  if(t.state==="clean"&&total(t)+t.hex+t.cl+t.ca>0.01){coach("Pour the tube into the waste first, then rinse it.",true);return}
+  t.rinseT=0;coach("Rinsing…");
+}
+function emptyTube(t){
+  t.salt={NaF:0,NaCl:0,NaBr:0,KI:0};t.hex=t.cl=t.ca=t.exCl=0;t.label="";if(t.sel)t.sel.value="";
+  t.hintOrder=t.hintVol=false;t.warnNaF=t.warnNaCl=t.warnNaBr=t.warnKI=false;
+  t.v.ext=t.v.mix=t.v.ppt=t.v.settle=0;t.v.fill=1;t.v.rot=0;t.drops=[];
+}
+
+/* ---------- chemistry ---------- */
+function targets(t){
+  var saltT=total(t), main=mainSalt(t), hal=main?SALTS[main]:null, ext=0, kind=null, turb=0;
+  if(t.part===1&&(hal==="Br"||hal==="I")&&t.cl>0){
+    ext=Math.min(1.1,t.cl/0.25)*Math.min(1,t.salt[main]/0.6);kind=hal;
+  }
+  if(t.part===2&&t.ca>0){
+    var f=Math.min(1,t.ca/0.5), sv=Math.min(1,saltT/4.2);
+    if(hal==="F")turb=f*sv;
+    else if(hal==="Cl"&&opts.cl==="key")turb=0.17*f*sv;
+  }
+  return {aq:saltT+t.cl+t.ca,hex:t.hex,ext:ext,kind:kind,turb:turb};
+}
+function comp(layers){
+  var r=0,g=0,b=0,a=0;
+  for(var k=0;k<layers.length;k++){var L=layers[k],la=L[3];if(la<=0)continue;var na=la+a*(1-la);r=(L[0]*la+r*a*(1-la))/na;g=(L[1]*la+g*a*(1-la))/na;b=(L[2]*la+b*a*(1-la))/na;a=na}
+  return "rgba("+(r|0)+","+(g|0)+","+(b|0)+","+a.toFixed(3)+")";
+}
+function lerp(a,b,r){return a+(b-a)*Math.min(1,r)}
+
+function update(t,dt){
+  var T=targets(t),v=t.v;
+  v.ext=lerp(v.ext,T.ext,dt*0.9);
+  var mt=(T.hex>0.049&&t.cl>0)?Math.min(1,t.exCl/t.cl):0;
+  v.mix=lerp(v.mix,mt,dt*1.3);
+  v.ppt=lerp(v.ppt,T.turb,dt*0.7);
+  v.settle=lerp(v.settle,v.ppt>0.05?0.55:0,dt*0.08);
+  if(v.shake>0)v.shake=Math.max(0,v.shake-dt);
+  if(t.pour>0)t.pour=Math.max(0,t.pour-dt);
+  if(t.dumping){
+    t.dumpT+=dt;
+    v.rot=-78*Math.sin(Math.min(1,t.dumpT/0.45)*Math.PI/2);
+    v.fill=1-Math.max(0,Math.min(1,(t.dumpT-0.2)/0.55));
+    if(t.dumpT>1.15){emptyTube(t);t.dumping=false;t.state="dirty";coach("Poured out. Now rinse the tube three times.")}
+  }
+  if(t.rinseT>=0){
+    t.rinseT+=dt;
+    if(t.rinseT>1.8){t.rinseT=-1;if(total(t)+t.hex+t.cl+t.ca>0.01){}else{t.state="clean";emptyTube(t);coach("Rinsed three times. The tube is clean and ready.")}}
+  }
+  var top=260-(T.aq+T.hex)*(205/PARTS[t.part].cap)*v.fill;
+  for(var k=t.drops.length-1;k>=0;k--){var d=t.drops[k];d.y+=dt*340;if(d.y>=top)t.drops.splice(k,1)}
+}
+
+/* ---------- render ---------- */
+function tubeSVG(t){
+  var cfg=PARTS[t.part],pxMl=205/cfg.cap,B=260,v=t.v,T=targets(t);
+  var aqPx=T.aq*pxMl*v.fill,hexPx=T.hex*pxMl*v.fill,aqTop=B-aqPx,hexTop=aqTop-hexPx;
+  var id="c"+t.part+"_"+t.i;
+  var aqAmt=v.ext*(1-v.mix),orgAmt=v.ext*v.mix,kind=T.kind||(v.ext>0.02?(t.salt.KI>t.salt.NaBr?"I":"Br"):null);
+  var clAmt=Math.min(1,t.cl/0.25)*(1-Math.min(1,v.ext)*0.8);
+  var aqL=[[160,205,225,0.26]];
+  if(t.cl>0)aqL.push([215,232,110,0.32*clAmt]);
+  if(kind&&aqAmt>0)aqL.push(KIND_AQ[kind].concat([Math.min(0.85,aqAmt*0.85)]));
+  var orgL=[[228,234,212,0.2]];
+  if(kind&&orgAmt>0)orgL.push(KIND_ORG[kind].concat([Math.min(0.92,orgAmt*0.92)]));
+  var s='<svg viewBox="0 0 100 300" xmlns="http://www.w3.org/2000/svg"><defs><clipPath id="'+id+'"><path d="M26 30H74V235A24 24 0 0 1 26 235Z"/></clipPath></defs>';
+  var sx=v.shake>0?Math.sin(performance.now()/22)*5*v.shake:0, sr=v.shake>0?Math.sin(performance.now()/30)*3*v.shake:0;
+  s+='<g transform="translate('+sx.toFixed(1)+' 0) rotate('+(v.rot+sr).toFixed(1)+' 50 40)">';
+  s+='<g clip-path="url(#'+id+')">';
+  if(aqPx>0.5)s+='<rect x="20" y="'+aqTop.toFixed(1)+'" width="60" height="'+(aqPx+30).toFixed(1)+'" fill="'+comp(aqL)+'"/>';
+  if(hexPx>0.5)s+='<rect x="20" y="'+hexTop.toFixed(1)+'" width="60" height="'+hexPx.toFixed(1)+'" fill="'+comp(orgL)+'"/>';
+  if(aqPx>0.5&&hexPx>0.5)s+='<line x1="26" x2="74" y1="'+aqTop.toFixed(1)+'" y2="'+aqTop.toFixed(1)+'" stroke="#ffffff" stroke-opacity=".55" stroke-width="1.5"/>';
+  if(t.rinseT>=0){var wh=10+30*Math.pow(Math.sin(t.rinseT*Math.PI*1.7),2);s+='<rect x="20" y="'+(B-wh)+'" width="60" height="'+(wh+30)+'" fill="rgba(110,180,230,.45)"/>'}
+  if(v.ppt>0.01&&aqPx>2){
+    s+='<rect x="20" y="'+aqTop.toFixed(1)+'" width="60" height="'+(aqPx+30).toFixed(1)+'" fill="rgba(255,255,255,'+Math.min(0.82,v.ppt*0.8).toFixed(3)+')"/>';
+    var now=performance.now()/1000;
+    for(var k=0;k<t.speck.length;k++){var sp=t.speck[k],yy=aqTop+((sp.y+now*sp.s)%1)*aqPx;s+='<circle cx="'+(28+sp.x*44).toFixed(1)+'" cy="'+yy.toFixed(1)+'" r="'+sp.r.toFixed(1)+'" fill="#fff" fill-opacity="'+Math.min(0.9,v.ppt).toFixed(2)+'"/>'}
+    if(v.settle>0.01)s+='<rect x="20" y="'+(B-v.settle*30)+'" width="60" height="'+(v.settle*30+10)+'" fill="rgba(255,255,255,'+Math.min(0.92,v.ppt+0.1).toFixed(2)+')"/>';
+  }
+  s+='</g>';
+  // pour stream
+  var surf=T.hex>0?hexTop:aqTop;
+  if(t.pour>0&&t.pourCol)s+='<rect x="47" y="8" width="6" height="'+Math.max(0,surf-8).toFixed(1)+'" fill="rgb('+t.pourCol.join(",")+')" opacity=".85"/>';
+  t.drops.forEach(function(d){s+='<ellipse cx="'+d.x.toFixed(1)+'" cy="'+d.y.toFixed(1)+'" rx="3" ry="4" fill="rgb('+d.c.join(",")+')" stroke="rgba(0,0,0,.25)" stroke-width=".6"/>'});
+  // graduations
+  var step=t.part===1?0.5:1;
+  for(var m=step;m<=cfg.cap+1e-9;m+=step){
+    var y=B-m*pxMl;if(y<40)break;var whole=Math.abs(m-Math.round(m))<1e-9,lab=t.part===1?whole:(Math.round(m)%5===0);
+    s+='<line x1="26" x2="'+(lab?36:31)+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="var(--tube-edge)" stroke-width="1.2"/>';
+    if(lab)s+='<text x="23" y="'+(y+3.5).toFixed(1)+'" text-anchor="end" font-size="9.5" fill="var(--muted)" font-family="Atkinson Hyperlegible,system-ui,sans-serif">'+Math.round(m)+'</text>';
+  }
+  s+='<path d="M26 22V235A24 24 0 0 0 74 235V22" fill="none" stroke="var(--tube-edge)" stroke-width="2.6" stroke-linecap="round"/><path d="M20 22H80" stroke="var(--tube-edge)" stroke-width="3" stroke-linecap="round"/>';
+  s+='<path d="M31 40V215" stroke="#fff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>';
+  if(t.label)s+='<rect x="30" y="92" width="40" height="22" rx="3" fill="#fff" stroke="#8fa1ab"/><text x="50" y="107" text-anchor="middle" font-size="'+(t.label.length>3?12:13)+'" font-weight="700" fill="#12222b" font-family="Atkinson Hyperlegible,system-ui,sans-serif">'+t.label+'</text>';
+  s+='</g></svg>';
+  return s;
+}
+function capText(t){
+  var parts=[],p=t.part;
+  for(var k in t.salt){if(t.salt[k]>0.001)parts.push(k+" "+(p===1?Math.round(t.salt[k]/DROP)+" drops":t.salt[k].toFixed(1)+" mL"))}
+  if(t.hex>0.001)parts.push("hexane "+Math.round(t.hex/DROP)+" drops");
+  if(t.cl>0.001)parts.push("Cl₂ water "+Math.round(t.cl/DROP)+" drops");
+  if(t.ca>0.001)parts.push("Ca(NO₃)₂ "+Math.round(t.ca/DROP)+" drops");
+  var s=parts.length?parts.join(", "):(t.state==="dirty"?"Empty. Needs rinsing.":"Clean and empty.");
+  var m=mainSalt(t);
+  if(t.label&&m&&t.label!==m)s+='<br><span class="bad">Label says '+t.label+' but tube holds '+m+'.</span>';
+  return s;
+}
+
+var last=performance.now();
+function frame(now){
+  var dt=Math.min(0.05,(now-last)/1000);last=now;
+  tubes[part].forEach(function(t){
+    update(t,dt);
+    $("#tb"+part+"_"+t.i).innerHTML=tubeSVG(t);
+    var c=capText(t);if(c!==t.capText){t.capText=c;$("#cp"+part+"_"+t.i).innerHTML=c}
+  });
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Bohr models ---------- */
+var BOHR=[{sym:"F",p:9,sh:[2,7]},{sym:"Cl",p:17,sh:[2,8,7]},{sym:"Br",p:35,sh:[2,8,18,7]},{sym:"I",p:53,sh:[2,8,18,18,7]}];
+function bohrSVG(e){
+  var s='<svg viewBox="0 0 200 200" role="img" aria-label="Bohr model of '+e.sym+': '+e.sh.join(", ")+' electrons per shell"><circle cx="100" cy="100" r="14" fill="var(--accent)"/><text x="100" y="104" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Atkinson Hyperlegible,system-ui,sans-serif">'+e.p+'+</text>';
+  e.sh.forEach(function(n,k){
+    var r=26+k*17;
+    s+='<circle cx="100" cy="100" r="'+r+'" fill="none" stroke="var(--tube-edge)" stroke-width="1.4"/>';
+    for(var j=0;j<n;j++){var a=(j/n)*Math.PI*2-Math.PI/2+k*0.5;s+='<circle cx="'+(100+r*Math.cos(a)).toFixed(1)+'" cy="'+(100+r*Math.sin(a)).toFixed(1)+'" r="3.3" fill="var(--teal)"/>'}
+  });
+  return s+'</svg>';
+}
+function buildBohr(){
+  var h="";
+  BOHR.forEach(function(e){h+='<div class="bm">'+bohrSVG(e)+'<span><strong>'+e.sym+'</strong>: '+e.p+' protons<br>'+e.sh.join(", ")+' electrons</span></div>'});
+  $("#bohr").innerHTML=h;
+}
+
+/* ---------- wiring ---------- */
+function showPart(p){
+  part=p;
+  $("#panel1").hidden=p!==1;$("#panel2").hidden=p!==2;
+  $("#tab1").setAttribute("aria-pressed",String(p===1));$("#tab2").setAttribute("aria-pressed",String(p===2));
+  coach(p===1?"Part I: label three tubes, then add each solution, hexane, and chlorine water.":"Part II: label four tubes, pour 5.0 mL of each solution, then add Ca(NO₃)₂ drops.");
+}
+$("#tab1").addEventListener("click",function(){showPart(1)});
+$("#tab2").addEventListener("click",function(){showPart(2)});
+$("#go2").addEventListener("click",function(){showPart(2);window.scrollTo({top:0})});
+$$(".gogglesBtn").forEach(function(b){b.addEventListener("click",function(){
+  goggles=!goggles;$$(".gogglesBtn").forEach(function(x){x.setAttribute("aria-pressed",String(goggles));x.textContent=goggles?"🥽 Goggles on":"🥽 Put on goggles"});
+  coach(goggles?"Goggles on. Click a bottle to pick it up.":"Goggles off.");
+})});
+$$(".resetBtn").forEach(function(b){b.addEventListener("click",function(){var p=+b.dataset.part;selected[p]=null;initTubes(p);build(p);$("#sel"+p).textContent="Nothing selected.";coach("Part "+(p===1?"I":"II")+" reset.")})});
+$("#optGoggles").addEventListener("change",function(){opts.goggles=this.checked});
+$("#optCl").addEventListener("change",function(){opts.cl=this.value});
+initTubes(1);initTubes(2);build(1);build(2);buildBohr();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
