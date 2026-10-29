@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metals, Nonmetals, and Metalloids: Virtual Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#e6edf1; --panel:#ffffff; --ink:#12222b; --muted:#566872; --line:#c9d6dd;
+  --teal:#0e6b78; --teal-soft:#d6eaee; --accent:#c2410c; --warn:#8f5200; --warn-bg:#fff1d6;
+  --bench:#d3dee4; --focus:#1d63d1;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d171c; --panel:#16232a; --ink:#e3edf1; --muted:#9db0b9; --line:#2b3d46;
+    --teal:#56b9c6; --teal-soft:#1c3a42; --accent:#ff9a62; --warn:#ffcf7a; --warn-bg:#3a2d12;
+    --bench:#22343e; --focus:#7fb0ff; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d171c; --panel:#16232a; --ink:#e3edf1; --muted:#9db0b9; --line:#2b3d46;
+  --teal:#56b9c6; --teal-soft:#1c3a42; --accent:#ff9a62; --warn:#ffcf7a; --warn-bg:#3a2d12;
+  --bench:#22343e; --focus:#7fb0ff; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:18px 16px 48px}
+h1{margin:0 0 4px;font-size:1.7rem;line-height:1.2;letter-spacing:-.01em}
+h2{margin:0 0 8px;font-size:1.15rem}
+h3{margin:12px 0 6px;font-size:1rem}
+p{margin:0 0 8px}
+.muted{color:var(--muted)}.small{font-size:.9rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 12px;cursor:pointer;min-height:40px}
+button:hover:not(:disabled){border-color:var(--teal)}
+button[aria-pressed="true"],button[aria-selected="true"]{background:var(--teal-soft);border-color:var(--teal);font-weight:700}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,select:focus-visible,summary:focus-visible,canvas:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+select{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:6px 8px}
+.modes{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.modes button{font-weight:700}
+.main{display:grid;gap:16px;margin-top:14px}
+@media(min-width:960px){.main{grid-template-columns:minmax(0,300px) minmax(0,1fr);align-items:start}}
+.grp{margin:10px 0 4px;font-size:.85rem;color:var(--muted);font-weight:700;text-transform:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:flex;align-items:center;gap:8px;padding:5px 10px 5px 6px;min-height:40px}
+.chip .sw{width:24px;height:24px;border-radius:50%;border:1px solid rgba(0,0,0,.25);flex:none}
+.chip .sw.gas{background:repeating-linear-gradient(45deg,#fff 0 3px,#dfe9ee 3px 6px)}
+.stations{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+canvas{width:100%;display:block;aspect-ratio:720/400;border-radius:8px;background:var(--bench);touch-action:manipulation}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;align-items:center}
+.go{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700}
+:root[data-theme="dark"] .go{color:#04181c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .go{color:#04181c}}
+.coach{margin:10px 0 0;padding:8px 12px;border-radius:8px;background:var(--teal-soft);min-height:2.7em;font-size:.95rem}
+.coach.warn{background:var(--warn-bg);color:var(--warn)}
+.intro{margin-top:14px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}
+.row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Metals, nonmetals, and metalloids: virtual lab</h1>
+  <p class="muted" style="max-width:74ch">Test the properties of elements at four stations. Look at each sample, test whether it conducts electricity, hit it with a hammer, and see how it reacts. Record what you see on your lab report, then decide where each element belongs.</p>
+</header>
+
+<section class="card intro" id="intro" aria-live="polite"></section>
+
+<div class="main">
+  <section class="card" aria-labelledby="h-shelf">
+    <h2 id="h-shelf">Samples</h2>
+    <div id="shelf"></div>
+  </section>
+  <section class="card" aria-labelledby="h-bench">
+    <h2 id="h-bench">Lab bench</h2>
+    <div class="stations" role="tablist" aria-label="Lab stations" id="stations"></div>
+    <canvas id="scene" role="img" aria-label="Lab station scene" tabindex="0"></canvas>
+    <div class="controls" id="controls"></div>
+    <div class="coach" id="coach" role="status" aria-live="polite">Pick a sample from the shelf to begin.</div>
+  </section>
+</div>
+
+<section class="card" style="margin-top:16px" aria-label="Teacher options">
+  <details>
+    <summary style="cursor:pointer;font-weight:700">Teacher options</summary>
+    <div class="row" style="margin-top:10px">
+      <label><input type="checkbox" id="optAll"> Allow all four stations for the seven appearance-only samples</label>
+      <label>Carbon sample
+        <select id="optC"><option value="charcoal" selected>Charcoal (does not conduct)</option><option value="graphite">Graphite (conducts)</option></select>
+      </label>
+    </div>
+    <p class="small muted" style="margin-top:10px">Results are set from typical behavior of each element with 1 M HCl, and are listed below so you can check them against your key.</p>
+    <div style="overflow-x:auto"><table id="keyTable"></table></div>
+  </details>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)};
+var LW=720,LH=400,BASE=300;
+var cv=$("#scene");
+
+/* ---------- element data ---------- */
+var EL={
+  Cu:{n:"Copper",s:"Cu",col:[198,115,70],lus:1,form:"chunk",cond:"good",mall:"malleable",acid:"none",cucl:"none",type:"Metal"},
+  Mg:{n:"Magnesium",s:"Mg",col:[205,208,212],lus:.9,form:"ribbon",cond:"good",mall:"malleable",acid:"vigorous",cucl:"fast",type:"Metal"},
+  Al:{n:"Aluminum",s:"Al",col:[196,200,205],lus:.85,form:"chunk",cond:"good",mall:"malleable",acid:"delayed",cucl:"delayed",type:"Metal"},
+  Zn:{n:"Zinc",s:"Zn",col:[165,175,190],lus:.8,form:"chunk",cond:"good",mall:"malleable",acid:"moderate",cucl:"moderate",type:"Metal"},
+  Ni:{n:"Nickel",s:"Ni",col:[178,178,172],lus:.9,form:"chunk",cond:"good",mall:"malleable",acid:"veryslow",cucl:"none",type:"Metal"},
+  Sn:{n:"Tin",s:"Sn",col:[205,205,210],lus:.85,form:"chunk",cond:"good",mall:"malleable",acid:"slight",cucl:"none",type:"Metal"},
+  Pb:{n:"Lead",s:"Pb",col:[105,110,120],lus:.4,form:"chunk",cond:"good",mall:"malleable",acid:"none",cucl:"none",type:"Metal"},
+  Ag:{n:"Silver",s:"Ag",col:[230,230,234],lus:1,form:"chunk",cond:"good",mall:"malleable",acid:"none",cucl:"none",type:"Metal"},
+  Bi:{n:"Bismuth",s:"Bi",col:[185,165,172],lus:.8,form:"crystal",cond:"good",mall:"brittle",acid:"none",cucl:"none",type:"Metal"},
+  Sb:{n:"Antimony",s:"Sb",col:[150,156,166],lus:.85,form:"crystal",cond:"semi",mall:"brittle",acid:"none",cucl:"none",type:"Metalloid"},
+  Si:{n:"Silicon",s:"Si",col:[88,96,114],lus:.85,form:"crystal",cond:"semi",mall:"brittle",acid:"none",cucl:"none",type:"Metalloid"},
+  C:{n:"Carbon",s:"C",col:[42,42,46],lus:.1,form:"chunk",cond:"none",mall:"brittle",acid:"none",cucl:"none",type:"Nonmetal"},
+  S:{n:"Sulfur",s:"S",col:[236,216,62],lus:.1,form:"powder",cond:"none",mall:"brittle",acid:"none",cucl:"none",type:"Nonmetal"},
+  O:{n:"Oxygen",s:"O₂",gas:true,type:"Nonmetal"},
+  N:{n:"Nitrogen",s:"N₂",gas:true,type:"Nonmetal"},
+  H:{n:"Hydrogen",s:"H₂",gas:true,type:"Nonmetal"}
+};
+var TESTED=["Cu","Si","Mg","C","Ni","Al","Zn","S","Sn"];
+var LOOKONLY=["O","Pb","Bi","Ag","N","Sb","H"];
+var SOLIDS=["Cu","Mg","Al","Zn","Ni","Sn","Pb","Ag","Bi","Sb","Si","C","S"];
+var allStations=false,mode=2,station="look",sel=null,assign={A:"Mg",B:"S",C:"Si",D:"Sb"},carbonType="charcoal";
+var light={x:0,y:-.5};
+
+function data(id){
+  var k=mode===1?assign[id]:id, e=Object.assign({},EL[k],{key:k});
+  if(k==="C"&&carbonType==="graphite"){e.cond="good";e.lus=.45;e.col=[72,74,80]}
+  return e;
+}
+function label(id){return mode===1?"Element "+id:EL[id].n}
+function available(id,st){
+  if(!id)return false;
+  var e=data(id);
+  if(e.gas)return st==="look";
+  if(mode===2&&LOOKONLY.indexOf(id)>=0&&!allStations)return st==="look";
+  if(st==="cucl"&&mode!==1)return false;
+  return true;
+}
+
+/* ---------- helpers ---------- */
+function hash(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function mix(a,b,t){return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
+function rgba(c,a){return "rgba("+(c[0]|0)+","+(c[1]|0)+","+(c[2]|0)+","+(a==null?1:a)+")"}
+function lerp(a,b,r){return a+(b-a)*r}
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function coach(m,w){var c=$("#coach");c.textContent=m;c.className="coach"+(w?" warn":"")}
+
+function outline(key,n,jag){
+  var r=rng(hash(key)),pts=[];
+  for(var i=0;i<n;i++){var a=i/n*Math.PI*2;pts.push({a:a,r:jag?(0.72+r()*0.28):(0.9+r()*0.1)})}
+  return pts;
+}
+function pathPiece(ctx,e,cx,cy,w,h,seedExtra){
+  var jag=e.mall==="brittle"||e.form==="crystal"||e.form==="powder";
+  var pts=outline(e.key+(seedExtra||""),jag?11:14,jag),P=pts.map(function(p){return [cx+Math.cos(p.a)*w/2*p.r,cy+Math.sin(p.a)*h/2*p.r]});
+  ctx.beginPath();
+  if(jag){ctx.moveTo(P[0][0],P[0][1]);for(var i=1;i<P.length;i++)ctx.lineTo(P[i][0],P[i][1]);ctx.closePath()}
+  else{
+    var m=function(a,b){return [(a[0]+b[0])/2,(a[1]+b[1])/2]},s=m(P[P.length-1],P[0]);
+    ctx.moveTo(s[0],s[1]);
+    for(var j=0;j<P.length;j++){var nx=P[(j+1)%P.length],mm=m(P[j],nx);ctx.quadraticCurveTo(P[j][0],P[j][1],mm[0],mm[1])}
+    ctx.closePath();
+  }
+  return P;
+}
+function drawPiece(ctx,e,cx,cy,w,h,opt){
+  opt=opt||{};var L=opt.light||{x:-.4,y:-.5},lus=e.lus,col=e.col;
+  ctx.save();
+  pathPiece(ctx,e,cx,cy,w,h,opt.seed);
+  var g=ctx.createRadialGradient(cx+L.x*w*.3,cy+L.y*h*.3,2,cx,cy,Math.max(w,h)*.75);
+  g.addColorStop(0,rgba(mix(col,[255,255,255],.2+.5*lus)));
+  g.addColorStop(.5,rgba(col));
+  g.addColorStop(1,rgba(mix(col,[0,0,0],.38)));
+  ctx.fillStyle=g;ctx.fill();
+  ctx.save();ctx.clip();
+  var r=rng(hash(e.key+"f"));
+  if(e.form==="crystal"||e.mall==="brittle"&&lus>.5){
+    for(var i=0;i<7;i++){
+      var x1=cx+(r()-.5)*w,y1=cy+(r()-.5)*h,x2=cx+(r()-.5)*w,y2=cy+(r()-.5)*h,x3=cx+(r()-.5)*w,y3=cy+(r()-.5)*h;
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.lineTo(x3,y3);ctx.closePath();
+      var facing=(Math.cos(i*1.7+L.x*2.2)+1)/2;
+      ctx.fillStyle=rgba(facing>.5?[255,255,255]:[0,0,0],.05+.18*Math.abs(facing-.5)*lus*2);ctx.fill();
+    }
+  }
+  if(lus<.5){
+    for(var k=0;k<36;k++){ctx.fillStyle=rgba(r()>.5?[0,0,0]:[255,255,255],.12+r()*.12);ctx.beginPath();ctx.arc(cx+(r()-.5)*w,cy+(r()-.5)*h,1+r()*2,0,6.3);ctx.fill()}
+  }
+  // specular
+  var sx=cx+L.x*w*.28,sy=cy+L.y*h*.28,sg=ctx.createRadialGradient(sx,sy,0,sx,sy,Math.max(w,h)*.38);
+  sg.addColorStop(0,"rgba(255,255,255,"+(.85*lus).toFixed(2)+")");sg.addColorStop(1,"rgba(255,255,255,0)");
+  ctx.fillStyle=sg;ctx.fillRect(cx-w,cy-h,w*2,h*2);
+  if(opt.coat>0){ctx.fillStyle="rgba(176,92,52,"+Math.min(.92,opt.coat).toFixed(2)+")";ctx.fillRect(cx-w,cy-h,w*2,h*2);
+    for(var q=0;q<18;q++){ctx.fillStyle="rgba(120,60,30,"+(.25*opt.coat).toFixed(2)+")";ctx.beginPath();ctx.arc(cx+(r()-.5)*w,cy+(r()-.5)*h,2+r()*3,0,6.3);ctx.fill()}}
+  ctx.restore();
+  pathPiece(ctx,e,cx,cy,w,h,opt.seed);
+  ctx.strokeStyle=rgba(mix(col,[0,0,0],.55),.7);ctx.lineWidth=1.4;ctx.stroke();
+  ctx.restore();
+}
+
+/* ---------- scenes ---------- */
+var S={},ctxMain=null,lastKey="";
+function resetStation(){
+  S={t:0};
+  if(station==="conduct"){S.probe=0;S.target=0;S.bright=0}
+  if(station==="hammer"){S.phase="idle";S.t=0;S.sy=1;S.sx=1;S.tsy=1;S.tsx=1;S.shards=[];S.dust=[];S.broken=false;S.hits=0;S.hy=BASE-64-130;S.ang=-30;S.shake=0}
+  if(station==="hcl"||station==="cucl"){S.dropped=false;S.py=-20;S.bubbles=[];S.flakes=[];S.dep=0;S.rt=0}
+}
+function setup(){
+  var dpr=window.devicePixelRatio||1,w=cv.clientWidth||LW,key=w+"x"+dpr;
+  if(cv._key!==key){cv.width=Math.round(w*dpr);cv.height=Math.round(w*LH/LW*dpr);cv._key=key}
+  var c=cv.getContext("2d"),s=w/LW;c.setTransform(s*dpr,0,0,s*dpr,0,0);return c;
+}
+function bench(c){
+  c.fillStyle=css("--bench");c.fillRect(0,0,LW,LH);
+}
+function towel(c){
+  c.fillStyle="#f3f1ea";c.fillRect(120,BASE,480,56);
+  c.strokeStyle="rgba(120,130,140,.25)";c.lineWidth=1;
+  for(var x=120;x<=600;x+=16){c.beginPath();c.moveTo(x,BASE);c.lineTo(x,BASE+56);c.stroke()}
+  for(var y=BASE;y<=BASE+56;y+=14){c.beginPath();c.moveTo(120,y);c.lineTo(600,y);c.stroke()}
+  c.strokeStyle="rgba(0,0,0,.2)";c.strokeRect(120,BASE,480,56);
+}
+function note(c,t,x,y,al){c.fillStyle=css("--muted");c.font="14px "+FONT;c.textAlign=al||"center";c.fillText(t,x,y)}
+var FONT='"Atkinson Hyperlegible",system-ui,sans-serif';
+
+function drawLook(c){
+  bench(c);
+  if(!sel){note(c,"Pick a sample from the shelf.",360,200);return}
+  var e=data(sel);
+  c.fillStyle="rgba(255,255,255,.35)";c.beginPath();c.ellipse(360,300,200,36,0,0,6.3);c.fill();
+  if(e.gas){
+    // sealed test tube
+    var x=360;c.fillStyle="rgba(190,220,235,.25)";c.strokeStyle=css("--muted");c.lineWidth=3;
+    c.beginPath();c.moveTo(x-48,70);c.lineTo(x-48,300);c.arc(x,300,48,Math.PI,0,true);c.lineTo(x+48,70);c.fill();c.stroke();
+    c.fillStyle="#7a4a2a";c.fillRect(x-54,44,108,34);c.fillStyle="rgba(255,255,255,.2)";c.fillRect(x-48,48,16,26);
+    c.fillStyle="#fff";c.fillRect(x-30,170,60,34);c.strokeStyle="#8a9aa3";c.lineWidth=1;c.strokeRect(x-30,170,60,34);
+    c.fillStyle="#12222b";c.font="bold 17px "+FONT;c.textAlign="center";c.fillText(mode===1?"Sealed":e.s,x,193);
+    note(c,"Sealed test tube",360,380);return;
+  }
+  if(e.form==="chunk")drawPiece(c,e,360,215,230,150,{light:light});
+  else if(e.form==="crystal"){
+    drawPiece(c,e,325,230,150,110,{light:light,seed:"a"});drawPiece(c,e,405,205,130,100,{light:light,seed:"b"});drawPiece(c,e,370,250,110,70,{light:light,seed:"c"});
+  }else if(e.form==="powder"){
+    for(var i=0;i<6;i++){var r=rng(i*77+3);drawPiece(c,e,300+r()*120,230+r()*50,70+r()*50,50+r()*30,{light:light,seed:"p"+i})}
+    var rr=rng(5);for(var k=0;k<90;k++){c.fillStyle=rgba(mix(e.col,rr()>.5?[255,255,255]:[120,100,0],.25*rr()),.9);c.beginPath();c.arc(270+rr()*180,255+rr()*50,2+rr()*3,0,6.3);c.fill()}
+  }else if(e.form==="ribbon"){
+    c.save();var g=c.createLinearGradient(0,150,0,260);
+    for(var j=0;j<5;j++){
+      var y=170+j*22,x0=240+j*6,sh=Math.cos(j*1.3+light.x*2)*.5+.5;
+      var gg=c.createLinearGradient(x0,y-10,x0,y+14);gg.addColorStop(0,rgba(mix(e.col,[255,255,255],.5*sh+.15)));gg.addColorStop(.5,rgba(e.col));gg.addColorStop(1,rgba(mix(e.col,[0,0,0],.4)));
+      c.fillStyle=gg;c.beginPath();c.ellipse(360,y+8,125-j*6,16,0,0,6.3);c.fill();
+      c.strokeStyle="rgba(0,0,0,.35)";c.lineWidth=1.2;c.stroke();
+    }
+    c.restore();
+  }
+  note(c,"Move your pointer over the sample, like tilting it in the light.",360,380);
+}
+
+function drawConduct(c,dt){
+  bench(c);
+  S.probe+= (S.target-S.probe)*Math.min(1,dt*7);
+  var sampleY=292,tipY=lerp(150,sampleY-26,S.probe);
+  var e=sel?data(sel):null;
+  // dish
+  c.fillStyle="rgba(255,255,255,.5)";c.strokeStyle=css("--muted");c.lineWidth=2;
+  c.beginPath();c.ellipse(360,sampleY+22,110,22,0,0,6.3);c.fill();c.stroke();
+  if(e)drawPiece(c,e,360,sampleY,86,48,{light:{x:-.4,y:-.5}});
+  // wires
+  var P1={x:318,y:tipY},P2={x:402,y:tipY};
+  c.lineWidth=4;c.lineCap="round";c.strokeStyle="#c0392b";
+  c.beginPath();c.moveTo(190,92);c.lineTo(290,92);c.stroke();
+  c.strokeStyle="#2a2a2a";c.beginPath();c.moveTo(340,92);c.bezierCurveTo(340,92,P1.x,P1.y-110,P1.x,P1.y-50);c.stroke();
+  c.strokeStyle="#2a2a2a";c.beginPath();c.moveTo(130,128);c.bezierCurveTo(130,230,P2.x,P2.y-170,P2.x,P2.y-50);c.stroke();
+  // probes
+  [P1,P2].forEach(function(p){c.strokeStyle="#1b1b1b";c.lineWidth=9;c.beginPath();c.moveTo(p.x,p.y-52);c.lineTo(p.x,p.y-8);c.stroke();c.strokeStyle="#b9c3c9";c.lineWidth=3;c.beginPath();c.moveTo(p.x,p.y-8);c.lineTo(p.x,p.y+8);c.stroke()});
+  // battery
+  c.fillStyle="#31414a";c.fillRect(70,70,120,58);c.fillStyle="#e0a526";c.fillRect(70,70,40,58);
+  c.fillStyle="#fff";c.font="bold 15px "+FONT;c.textAlign="center";c.fillText("battery",150,104);
+  // bulb
+  var touching=S.probe>.97,b=0;
+  if(e&&touching){b=e.cond==="good"?1:e.cond==="semi"?.28+.04*Math.sin(S.t*28):0}
+  S.bright+=(b-S.bright)*Math.min(1,dt*14);
+  var g=c.createRadialGradient(315,92,2,315,92,26+70*S.bright);
+  g.addColorStop(0,"rgba(255,235,140,"+(.95*S.bright).toFixed(2)+")");g.addColorStop(1,"rgba(255,235,140,0)");
+  c.fillStyle=g;c.fillRect(200,0,230,200);
+  c.fillStyle=S.bright>.05?rgba(mix([210,220,225],[255,235,120],Math.min(1,S.bright)),1):"rgba(210,220,225,.65)";
+  c.strokeStyle=css("--muted");c.lineWidth=2;c.beginPath();c.arc(315,92,26,0,6.3);c.fill();c.stroke();
+  c.strokeStyle=S.bright>.05?"#fff":"#8a9aa3";c.lineWidth=2;c.beginPath();c.moveTo(305,100);c.lineTo(310,84);c.lineTo(320,100);c.lineTo(325,84);c.stroke();
+  c.fillStyle="#31414a";c.fillRect(300,116,30,14);
+  note(c,"micro-conductivity tester",315,160);
+  if(!e)note(c,"Pick a sample from the shelf.",360,370);
+}
+
+function drawHammer(c,dt){
+  var e=sel?data(sel):null;
+  var pw=120,ph=64,cx=360;
+  c.save();
+  if(S.shake>0){S.shake-=dt;c.translate((Math.random()-.5)*5*S.shake*6,(Math.random()-.5)*3*S.shake*6)}
+  bench(c);towel(c);
+  if(!e){note(c,"Pick a sample from the shelf.",360,200);c.restore();return}
+  S.sx+=(S.tsx-S.sx)*Math.min(1,dt*20);S.sy+=(S.tsy-S.sy)*Math.min(1,dt*20);
+  var topY=BASE-ph*S.sy,hitY=topY-17,idleY=BASE-ph-130;
+  // animation phases
+  if(S.phase==="down"){
+    S.t+=dt;var r=Math.min(1,S.t/.13),k=r*r;S.hy=lerp(S.from,hitY,k);S.ang=lerp(-30,0,k);
+    if(r>=1){impact(e);S.phase="up";S.t=0;S.hy=hitY}
+  }else if(S.phase==="up"){
+    S.t+=dt;var r2=Math.min(1,S.t/.16),k2=1-Math.pow(1-r2,2);S.hy=lerp(S.hitY,S.hitY-45,k2);S.ang=lerp(0,-12,r2);
+    if(r2>=1){S.phase="back";S.t=0;S.from2=S.hy}
+  }else if(S.phase==="back"){
+    S.t+=dt;var r3=Math.min(1,S.t/.4),k3=r3<.5?2*r3*r3:1-Math.pow(-2*r3+2,2)/2;S.hy=lerp(S.from2,idleY,k3);S.ang=lerp(-12,-30,r3);
+    if(r3>=1){S.phase="idle";S.hy=idleY;S.ang=-30}
+  }else{S.hy=idleY;S.ang=-30}
+  // sample
+  if(!S.broken){
+    c.save();c.translate(cx,BASE);c.scale(S.sx,S.sy);
+    drawPiece(c,e,0,-ph/2,pw,ph,{light:{x:-.4,y:-.6}});
+    c.restore();
+  }
+  // shards
+  S.shards.forEach(function(s){
+    s.vy+=1200*dt;s.x+=s.vx*dt;s.y+=s.vy*dt;s.a+=s.va*dt;
+    if(s.y>BASE-3){s.y=BASE-3;if(Math.abs(s.vy)>80)s.vy*=-.28;else s.vy=0;s.vx*=Math.pow(.02,dt);s.va*=Math.pow(.02,dt)}
+    if(s.x<130){s.x=130;s.vx=Math.abs(s.vx)*.3}if(s.x>590){s.x=590;s.vx=-Math.abs(s.vx)*.3}
+    c.save();c.translate(s.x,s.y);c.rotate(s.a);
+    c.beginPath();c.moveTo(s.p[0][0],s.p[0][1]);c.lineTo(s.p[1][0],s.p[1][1]);c.lineTo(s.p[2][0],s.p[2][1]);c.closePath();
+    c.fillStyle=rgba(mix(e.col,s.hi>.5?[255,255,255]:[0,0,0],.18*Math.abs(s.hi-.5)*2+ .05*e.lus));c.fill();
+    c.strokeStyle=rgba(mix(e.col,[0,0,0],.5),.8);c.lineWidth=1;c.stroke();c.restore();
+  });
+  S.dust=S.dust.filter(function(d){return d.l>0});
+  S.dust.forEach(function(d){d.l-=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=200*dt;c.fillStyle=rgba(mix(e.col,[140,140,140],.5),Math.max(0,d.l)*1.4);c.beginPath();c.arc(d.x,d.y,d.r,0,6.3);c.fill()});
+  // hammer
+  c.save();c.translate(cx,S.hy);c.rotate(S.ang*Math.PI/180);
+  c.fillStyle="#b07a45";c.fillRect(-7,-190,14,176);c.fillStyle="rgba(255,255,255,.2)";c.fillRect(-7,-190,4,176);
+  var hg=c.createLinearGradient(0,-17,0,17);hg.addColorStop(0,"#8d9aa3");hg.addColorStop(.5,"#5c6870");hg.addColorStop(1,"#2f383e");
+  c.fillStyle=hg;c.beginPath();c.moveTo(-40,-16);c.lineTo(40,-16);c.lineTo(40,17);c.lineTo(-40,17);c.closePath();c.fill();
+  c.strokeStyle="#1d2428";c.lineWidth=1.5;c.stroke();
+  c.fillStyle="rgba(255,255,255,.35)";c.fillRect(-36,-13,72,4);
+  c.restore();
+  c.restore();
+  note(c,S.hits?"":"Press “Tap with hammer.”",360,382);
+}
+function impact(e){
+  S.hits=(S.hits||0)+1;S.hitY=S.hy;S.shake=.16;
+  var cx=360;
+  if(e.mall==="malleable"){
+    S.tsy=Math.max(.2,S.tsy*.63);S.tsx=Math.min(2.15,S.tsx*1.2);
+    for(var i=0;i<8;i++)S.dust.push({x:cx+(Math.random()-.5)*100*S.sx,y:BASE-3,vx:(Math.random()-.5)*120,vy:-30-Math.random()*60,r:1+Math.random()*2,l:.4});
+  }else if(!S.broken){
+    S.broken=true;
+    var n=9,pts=outline(e.key,n,true),pw=120,ph=64*S.sy,base=BASE-ph/2;
+    var P=pts.map(function(p){return [Math.cos(p.a)*pw/2*p.r,Math.sin(p.a)*ph/2*p.r]});
+    var I=P.map(function(q){return [q[0]*.5,q[1]*.5]});
+    var tris=[];
+    for(var j=0;j<n;j++){var k=(j+1)%n;tris.push([P[j],P[k],I[j]]);tris.push([P[k],I[k],I[j]]);tris.push([[0,0],I[j],I[k]])}
+    tris.forEach(function(t){
+      var cen=[(t[0][0]+t[1][0]+t[2][0])/3,(t[0][1]+t[1][1]+t[2][1])/3];
+      S.shards.push({x:cx+cen[0],y:base+cen[1],p:t.map(function(v){return [v[0]-cen[0],v[1]-cen[1]]}),
+        vx:cen[0]*(3+Math.random()*4)+(Math.random()-.5)*90,vy:-(150+Math.random()*300)+cen[1]*2,a:0,va:(Math.random()-.5)*14,hi:Math.random()});
+    });
+    for(var d=0;d<34;d++)S.dust.push({x:cx+(Math.random()-.5)*110,y:BASE-10-Math.random()*40,vx:(Math.random()-.5)*340,vy:-60-Math.random()*220,r:1+Math.random()*2.6,l:.7});
+  }else{
+    for(var q=0;q<6;q++)S.dust.push({x:cx+(Math.random()-.5)*120,y:BASE-4,vx:(Math.random()-.5)*100,vy:-40-Math.random()*40,r:1+Math.random()*1.5,l:.35});
+  }
+}
+function hammerTap(){
+  if(station!=="hammer")return;
+  if(!sel||!available(sel,"hammer")){coach("Pick a solid sample first.",true);return}
+  if(S.phase!=="idle")return;
+  var e=data(sel),ph=64;
+  S.phase="down";S.t=0;S.from=S.hy;
+  coach("Tap again, and watch what happens to the sample each time.");
+}
+
+/* ---- acid / CuCl2 ---- */
+var TUBE={x:360,w:130,top:40,bot:350,liq:150};
+function drawTube(c,liqCol,liqA){
+  var x=TUBE.x,hw=TUBE.w/2;
+  // liquid
+  c.save();c.beginPath();c.moveTo(x-hw,TUBE.liq);c.lineTo(x+hw,TUBE.liq);c.lineTo(x+hw,TUBE.bot-hw);c.arc(x,TUBE.bot-hw,hw,0,Math.PI);c.closePath();
+  c.fillStyle=rgba(liqCol,liqA);c.fill();c.restore();
+}
+function drawTubeGlass(c){
+  var x=TUBE.x,hw=TUBE.w/2;
+  c.strokeStyle=css("--muted");c.lineWidth=3;c.lineCap="round";
+  c.beginPath();c.moveTo(x-hw,TUBE.top);c.lineTo(x-hw,TUBE.bot-hw);c.arc(x,TUBE.bot-hw,hw,Math.PI,0,true);c.lineTo(x+hw,TUBE.top);c.stroke();
+  c.beginPath();c.moveTo(x-hw-8,TUBE.top);c.lineTo(x+hw+8,TUBE.top);c.stroke();
+  c.strokeStyle="rgba(255,255,255,.4)";c.lineWidth=4;c.beginPath();c.moveTo(x-hw+10,TUBE.top+20);c.lineTo(x-hw+10,TUBE.bot-hw);c.stroke();
+}
+function reactScene(c,dt,isAcid){
+  bench(c);
+  var e=sel?data(sel):null;
+  var liq=isAcid?[165,208,232]:[70,175,165],liqA=isAcid?.38:.6;
+  var restY=TUBE.bot-26;
+  if(!e){drawTube(c,liq,liqA);drawTubeGlass(c);note(c,"Pick a sample from the shelf.",360,385);return}
+  if(S.dropped){
+    S.rt+=dt;
+    if(S.py<restY){S.vy=(S.vy||0)+900*dt;S.py=Math.min(restY,S.py+S.vy*(S.py>TUBE.liq?.35:1)*dt+ (S.py>TUBE.liq?60*dt:0))}
+  }
+  var settled=S.dropped&&S.py>=restY-1,t=S.rt-.9;
+  var size=1;
+  if(isAcid){
+    var rate=0,big=1;
+    if(settled&&t>0){
+      switch(e.acid){
+        case "vigorous":rate=46*Math.min(1,t/1.2);big=1.8;break;
+        case "moderate":rate=13*Math.min(1,t/2);big=1.2;break;
+        case "delayed":rate=t<2.5?0:11*Math.min(1,(t-2.5)/3);big=1.2;break;
+        case "slight":rate=t>1.5?1.5:0;big=.7;break;
+        case "veryslow":rate=t>3?.7:0;big=.6;break;
+      }
+    }
+    S.bubRate=rate;
+    if(e.acid==="vigorous"&&settled)size=Math.max(.45,1-t*.025);
+    S.acc=(S.acc||0)+rate*dt;
+    while(S.acc>=1){S.acc-=1;S.bubbles.push({x:TUBE.x+(Math.random()-.5)*40,y:restY-8-Math.random()*8,r:(1.6+Math.random()*2.2)*big,sp:55+Math.random()*60,ph:Math.random()*6,w:3+Math.random()*5})}
+    drawTube(c,liq,liqA);
+    if(S.dropped)drawPiece(c,e,TUBE.x,S.py,46*size,26*size,{light:{x:-.4,y:-.5}});
+    S.bubbles.forEach(function(b){b.y-=b.sp*dt;b.x+=Math.sin(b.ph+b.y*.08)*b.w*dt;
+      c.strokeStyle="rgba(255,255,255,.85)";c.fillStyle="rgba(255,255,255,.28)";c.lineWidth=1.2;c.beginPath();c.arc(b.x,b.y,b.r,0,6.3);c.fill();c.stroke()});
+    S.bubbles=S.bubbles.filter(function(b){return b.y>TUBE.liq+2});
+    if(rate>30){var rr=rng(9);c.fillStyle="rgba(255,255,255,.55)";for(var f=0;f<24;f++){c.beginPath();c.arc(TUBE.x-60+rr()*120,TUBE.liq+2+Math.sin(S.rt*8+f)*1.2,3+rr()*3,0,6.3);c.fill()}}
+  }else{
+    var dr=0;
+    if(settled&&t>0){dr=e.cucl==="fast"?.34:e.cucl==="moderate"?.15:e.cucl==="delayed"?(t<3.5?0:.11):0}
+    S.dep=Math.min(1,S.dep+dr*dt);
+    S.fAcc=(S.fAcc||0)+dr*dt*60;
+    while(S.fAcc>=1&&S.dep<1){S.fAcc-=1;S.flakes.push({x:TUBE.x+(Math.random()-.5)*50,y:restY,vy:20+Math.random()*30,r:1.5+Math.random()*2.5,s:0})}
+    var lc=mix(liq,[205,232,226],Math.min(.85,S.dep*.8)),la=lerp(liqA,.2,Math.min(1,S.dep*.8));
+    drawTube(c,lc,la);
+    if(S.dropped)drawPiece(c,e,TUBE.x,S.py,46,26,{light:{x:-.4,y:-.5},coat:S.dep});
+    // mound at bottom
+    if(S.dep>.02){c.fillStyle="rgba(150,75,40,"+Math.min(.9,S.dep).toFixed(2)+")";c.beginPath();c.ellipse(TUBE.x,TUBE.bot-4,50*Math.min(1,.3+S.dep),8*S.dep+2,0,0,6.3);c.fill()}
+    S.flakes.forEach(function(f){f.y+=f.vy*dt;c.fillStyle="rgba(165,85,45,.85)";c.fillRect(f.x,f.y,f.r*1.4,f.r)});
+    S.flakes=S.flakes.filter(function(f){return f.y<TUBE.bot-8});
+  }
+  drawTubeGlass(c);
+  c.fillStyle=css("--muted");c.font="14px "+FONT;c.textAlign="left";
+  c.fillText(isAcid?"5 mL of 1 M HCl":"CuCl₂ solution",TUBE.x+TUBE.w/2+16,TUBE.liq+16);
+  if(S.dropped){c.textAlign="left";c.fillText("Time: "+S.rt.toFixed(0)+" s",TUBE.x+TUBE.w/2+16,TUBE.liq+38)}
+}
+function dropSample(){
+  if(!sel||!available(sel,station)){coach("Pick a solid sample first.",true);return}
+  if(S.dropped)return;
+  S.dropped=true;S.py=30;S.vy=0;S.rt=0;
+  coach(station==="hcl"?"Watch closely. Not every reaction is vigorous, so give it time.":"Watch both the sample and the color of the solution.");
+}
+
+/* ---------- UI ---------- */
+function frameDraw(c,dt){
+  if(station==="look")drawLook(c);
+  else if(station==="conduct"){S.t+=dt;drawConduct(c,dt)}
+  else if(station==="hammer")drawHammer(c,dt);
+  else reactScene(c,dt,station==="hcl");
+}
+var last=performance.now();
+function frame(now){
+  var dt=Math.min(.05,(now-last)/1000);last=now;
+  frameDraw(setup(),dt);
+  requestAnimationFrame(frame);
+}
+function stationDefs(){
+  var d=[["look","Observe"],["conduct","Conductivity"],["hammer","Hammer"],["hcl","Acid (HCl)"]];
+  if(mode===1)d.push(["cucl","CuCl₂ solution"]);return d;
+}
+var HINT={look:"Move your pointer over the sample. Record its state, color, and luster on your lab report.",
+ conduct:"Press Touch probes to sample, then watch the bulb: bright, dim, or dark.",
+ hammer:"Press Tap with hammer, or click the scene. Tap a few times.",
+ hcl:"Drop the sample into the acid and watch closely for bubbles.",
+ cucl:"Drop the sample into the copper(II) chloride solution and watch the sample and the solution."};
+function buildStations(){
+  var h="";
+  stationDefs().forEach(function(d){h+='<button type="button" role="tab" data-st="'+d[0]+'" aria-selected="'+(station===d[0])+'">'+d[1]+'</button>'});
+  $("#stations").innerHTML=h;
+  Array.prototype.forEach.call($("#stations").children,function(b){b.addEventListener("click",function(){setStation(b.dataset.st)})});
+}
+function buildControls(){
+  var c=$("#controls"),ok=sel&&available(sel,station),h="";
+  if(station==="conduct")h='<button type="button" class="go" id="b1">Touch probes to sample</button><button type="button" id="b2">Lift probes</button>';
+  else if(station==="hammer")h='<button type="button" class="go" id="b1">Tap with hammer</button><button type="button" id="b2">New piece</button>';
+  else if(station==="hcl")h='<button type="button" class="go" id="b1">Drop sample into acid</button><button type="button" id="b2">Rinse and start over</button>';
+  else if(station==="cucl")h='<button type="button" class="go" id="b1">Drop sample into CuCl₂</button><button type="button" id="b2">Rinse and start over</button>';
+  c.innerHTML=h;
+  if(!h)return;
+  $("#b1").disabled=!ok;$("#b2").disabled=!ok;
+  $("#b1").addEventListener("click",function(){
+    if(station==="conduct"){S.target=1;coach("Probes touching the sample. What does the bulb do?")}
+    else if(station==="hammer")hammerTap();else dropSample();
+  });
+  $("#b2").addEventListener("click",function(){
+    if(station==="conduct"){S.target=0;coach("Probes lifted.")}else{resetStation();coach(station==="hammer"?"A fresh piece of the same sample.":"Tube rinsed. Ready for another try.")}
+  });
+}
+function setStation(st){
+  station=st;
+  Array.prototype.forEach.call($("#stations").children,function(b){b.setAttribute("aria-selected",String(b.dataset.st===st))});
+  resetStation();buildControls();
+  if(!sel)coach("Pick a sample from the shelf to begin.");
+  else if(!available(sel,st))coach(data(sel).gas?"Gases are observed in sealed tubes only. Use the Observe station.":"This sample is appearance-only in this lab. Use the Observe station.",true);
+  else coach(HINT[st]);
+}
+function setSample(id){
+  sel=id;
+  Array.prototype.forEach.call(document.querySelectorAll(".chip"),function(b){b.setAttribute("aria-pressed",String(b.dataset.id===id))});
+  if(!available(id,station)&&station!=="look"){setStation("look");return}
+  setStation(station);
+}
+function swatch(k){var e=EL[k];return e.gas?'<span class="sw gas"></span>':'<span class="sw" style="background:radial-gradient(circle at 35% 30%,'+rgba(mix(e.col,[255,255,255],.5))+','+rgba(e.col)+' 60%,'+rgba(mix(e.col,[0,0,0],.3))+')"></span>'}
+function buildShelf(){
+  var s=$("#shelf"),h="";
+  if(mode===1){
+    h+='<p class="small muted">Four unknown elements. Test each one at every station, then decide what type of element it is.</p><div class="chips">';
+    ["A","B","C","D"].forEach(function(id){var k=assign[id];h+='<button type="button" class="chip" data-id="'+id+'" aria-pressed="false">'+swatch(k)+'<span>Element '+id+'</span></button>'});
+    h+='</div>';
+  }else{
+    h+='<div class="grp">Tested at every station</div><div class="chips">';
+    TESTED.forEach(function(k){h+='<button type="button" class="chip" data-id="'+k+'" aria-pressed="false">'+swatch(k)+'<span>'+EL[k].n+'</span></button>'});
+    h+='</div><div class="grp">Observe by appearance only</div><div class="chips">';
+    LOOKONLY.forEach(function(k){h+='<button type="button" class="chip" data-id="'+k+'" aria-pressed="false">'+swatch(k)+'<span>'+EL[k].n+'</span></button>'});
+    h+='</div>';
+  }
+  s.innerHTML=h;
+  Array.prototype.forEach.call(s.querySelectorAll(".chip"),function(b){b.addEventListener("click",function(){setSample(b.dataset.id)})});
+}
+function setMode(m){
+  mode=m;sel=null;station="look";
+    $("#intro").innerHTML='<h2>Station lab</h2><p>Choose a sample on the left, then work through the four stations across the top of the bench: <strong>Observe</strong>, <strong>Conductivity</strong>, <strong>Hammer</strong>, and <strong>Acid (HCl)</strong>. Nine elements can be tested at every station. Seven more are observed by appearance only. Record your data on your lab report and classify each element as a metal, a nonmetal, or a metalloid.</p>';
+  buildShelf();buildStations();resetStation();buildControls();coach("Pick a sample from the shelf to begin.");
+  buildKey();
+}
+function buildKey(){
+  var rows='<thead><tr><th>Element</th><th>Type</th><th>Luster</th><th>Conducts</th><th>Hammer</th><th>HCl</th></tr></thead><tbody>';
+  var lbl={good:"Yes",semi:"Weakly (semiconductor)",none:"No",none2:"No"};
+  var acid={none:"No reaction",vigorous:"Vigorous bubbles",moderate:"Steady bubbles",delayed:"Bubbles after a delay",slight:"A few bubbles",veryslow:"Very few tiny bubbles"};
+  var cu={none:"No reaction",fast:"Copper coats the sample quickly",moderate:"Copper coats the sample",delayed:"Copper coats the sample after a delay"};
+  SOLIDS.forEach(function(k){
+    var e=Object.assign({},EL[k],{key:k});if(k==="C"&&carbonType==="graphite"){e.cond="good";e.lus=.45}
+    rows+='<tr><td>'+e.n+'</td><td>'+e.type+'</td><td>'+(e.lus>.7?"High":e.lus>.3?"Medium":"Dull")+'</td><td>'+lbl[e.cond]+'</td><td>'+(e.mall==="malleable"?"Flattens":"Shatters")+'</td><td>'+acid[e.acid]+'</td></tr>';
+  });
+  rows+='<tr><td>Oxygen, nitrogen, hydrogen</td><td>Nonmetal</td><td colspan="4">Colorless gases in sealed tubes (appearance only)</td></tr></tbody>';
+  $("#keyTable").innerHTML=rows;
+}
+$("#optAll").addEventListener("change",function(){allStations=this.checked;if(sel)setStation(station)});
+$("#optC").addEventListener("change",function(){carbonType=this.value;buildKey();if(sel)resetStation()});
+cv.addEventListener("pointermove",function(e){
+  var r=cv.getBoundingClientRect();light.x=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width-.5)*2));light.y=Math.max(-1,Math.min(1,((e.clientY-r.top)/r.height-.5)*2));
+});
+cv.addEventListener("click",function(){if(station==="hammer")hammerTap()});
+cv.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&station==="hammer"){e.preventDefault();hammerTap()}});
+
+setMode(2);
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
