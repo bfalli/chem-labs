@@ -92,19 +92,6 @@ th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}
   </section>
 </div>
 
-<section class="card" style="margin-top:16px" aria-label="Teacher options">
-  <details>
-    <summary style="cursor:pointer;font-weight:700">Teacher options</summary>
-    <div class="row" style="margin-top:10px">
-      <label><input type="checkbox" id="optAll"> Allow all four stations for the seven appearance-only samples</label>
-      <label>Carbon sample
-        <select id="optC"><option value="charcoal" selected>Charcoal (does not conduct)</option><option value="graphite">Graphite (conducts)</option></select>
-      </label>
-    </div>
-    <p class="small muted" style="margin-top:10px">Results are set from typical behavior of each element with 1 M HCl, and are listed below so you can check them against your key.</p>
-    <div style="overflow-x:auto"><table id="keyTable"></table></div>
-  </details>
-</section>
 </div>
 
 <script>
@@ -262,14 +249,26 @@ function drawLook(c){
     for(var i=0;i<6;i++){var r=rng(i*77+3);drawPiece(c,e,300+r()*120,230+r()*50,70+r()*50,50+r()*30,{light:light,seed:"p"+i})}
     var rr=rng(5);for(var k=0;k<90;k++){c.fillStyle=rgba(mix(e.col,rr()>.5?[255,255,255]:[120,100,0],.25*rr()),.9);c.beginPath();c.arc(270+rr()*180,255+rr()*50,2+rr()*3,0,6.3);c.fill()}
   }else if(e.form==="ribbon"){
-    c.save();var g=c.createLinearGradient(0,150,0,260);
-    for(var j=0;j<5;j++){
-      var y=170+j*22,x0=240+j*6,sh=Math.cos(j*1.3+light.x*2)*.5+.5;
-      var gg=c.createLinearGradient(x0,y-10,x0,y+14);gg.addColorStop(0,rgba(mix(e.col,[255,255,255],.5*sh+.15)));gg.addColorStop(.5,rgba(e.col));gg.addColorStop(1,rgba(mix(e.col,[0,0,0],.4)));
-      c.fillStyle=gg;c.beginPath();c.ellipse(360,y+8,125-j*6,16,0,0,6.3);c.fill();
-      c.strokeStyle="rgba(0,0,0,.35)";c.lineWidth=1.2;c.stroke();
-    }
-    c.restore();
+    var loops=5,cx0=345,cy0=152,gap=27,rw=17,hl=Math.max(.12,Math.min(.88,light.x*.5+.5));
+    var drawArc=function(i,front){
+      var cy=cy0+i*gap,rx=120-i*3+Math.sin(i*1.7)*5,ry=33+(i%2)*6,cxi=cx0+Math.sin(i*2.1)*10,x0=cxi-rx,x1=cxi+rx;
+      var g=c.createLinearGradient(x0,0,x1,0);
+      g.addColorStop(0,rgba(mix(e.col,[0,0,0],.42)));
+      g.addColorStop(Math.max(.03,hl-.2),rgba(mix(e.col,[255,255,255],.1)));
+      g.addColorStop(hl,rgba(mix(e.col,[255,255,255],.85)));
+      g.addColorStop(Math.min(.97,hl+.2),rgba(mix(e.col,[255,255,255],.1)));
+      g.addColorStop(1,rgba(mix(e.col,[0,0,0],.42)));
+      c.lineCap="butt";
+      c.beginPath();c.ellipse(cxi,cy,rx,ry,0,front?0:Math.PI,front?Math.PI:Math.PI*2);
+      c.strokeStyle="rgba(0,0,0,.4)";c.lineWidth=rw+3;c.stroke();
+      c.strokeStyle=g;c.lineWidth=rw;c.stroke();
+      c.strokeStyle="rgba(255,255,255,"+(front?.3:.12)+")";c.lineWidth=2;c.stroke();
+    };
+    for(var i=loops-1;i>=0;i--){drawArc(i,false);drawArc(i,true)}
+    // loose end of the ribbon
+    var tg=c.createLinearGradient(460,0,590,0);tg.addColorStop(0,rgba(mix(e.col,[255,255,255],.2+.5*(1-Math.abs(hl-.8)))));tg.addColorStop(1,rgba(mix(e.col,[0,0,0],.35)));
+    c.lineCap="butt";c.beginPath();c.moveTo(464,168);c.bezierCurveTo(520,176,560,200,590,176);
+    c.strokeStyle="rgba(0,0,0,.4)";c.lineWidth=rw+3;c.stroke();c.strokeStyle=tg;c.lineWidth=rw;c.stroke();
   }
   note(c,"Move your pointer over the sample, like tilting it in the light.",360,380);
 }
@@ -466,6 +465,7 @@ function dropSample(){
 
 /* ---------- UI ---------- */
 function frameDraw(c,dt){
+  if(station!=="look"&&sel&&!available(sel,station)){bench(c);note(c,"This sample is observed by appearance only.",360,200);return}
   if(station==="look")drawLook(c);
   else if(station==="conduct"){S.t+=dt;drawConduct(c,dt)}
   else if(station==="hammer")drawHammer(c,dt);
@@ -474,7 +474,7 @@ function frameDraw(c,dt){
 var last=performance.now();
 function frame(now){
   var dt=Math.min(.05,(now-last)/1000);last=now;
-  frameDraw(setup(),dt);
+  try{frameDraw(setup(),dt)}catch(err){console.error(err)}
   requestAnimationFrame(frame);
 }
 function stationDefs(){
@@ -509,13 +509,22 @@ function buildControls(){
     if(station==="conduct"){S.target=0;coach("Probes lifted.")}else{resetStation();coach(station==="hammer"?"A fresh piece of the same sample.":"Tube rinsed. Ready for another try.")}
   });
 }
+function refreshTabs(){
+  Array.prototype.forEach.call($("#stations").children,function(b){
+    var off=!!sel&&!available(sel,b.dataset.st);
+    b.disabled=off;
+    b.title=off?"Not available for this sample. It is observed by appearance only.":"";
+  });
+}
 function setStation(st){
+  if(sel&&st!=="look"&&!available(sel,st)){coach("This sample is observed by appearance only. Choose a different sample to use this station.",true);refreshTabs();return}
   station=st;
   Array.prototype.forEach.call($("#stations").children,function(b){b.setAttribute("aria-selected",String(b.dataset.st===st))});
   resetStation();buildControls();
   if(!sel)coach("Pick a sample from the shelf to begin.");
   else if(!available(sel,st))coach(data(sel).gas?"Gases are observed in sealed tubes only. Use the Observe station.":"This sample is appearance-only in this lab. Use the Observe station.",true);
   else coach(HINT[st]);
+  refreshTabs();
 }
 function setSample(id){
   sel=id;
@@ -544,22 +553,7 @@ function setMode(m){
   mode=m;sel=null;station="look";
     $("#intro").innerHTML='<h2>Station lab</h2><p>Choose a sample on the left, then work through the four stations across the top of the bench: <strong>Observe</strong>, <strong>Conductivity</strong>, <strong>Hammer</strong>, and <strong>Acid (HCl)</strong>. Nine elements can be tested at every station. Seven more are observed by appearance only. Record your data on your lab report and classify each element as a metal, a nonmetal, or a metalloid.</p>';
   buildShelf();buildStations();resetStation();buildControls();coach("Pick a sample from the shelf to begin.");
-  buildKey();
 }
-function buildKey(){
-  var rows='<thead><tr><th>Element</th><th>Type</th><th>Luster</th><th>Conducts</th><th>Hammer</th><th>HCl</th></tr></thead><tbody>';
-  var lbl={good:"Yes",semi:"Weakly (semiconductor)",none:"No",none2:"No"};
-  var acid={none:"No reaction",vigorous:"Vigorous bubbles",moderate:"Steady bubbles",delayed:"Bubbles after a delay",slight:"A few bubbles",veryslow:"Very few tiny bubbles"};
-  var cu={none:"No reaction",fast:"Copper coats the sample quickly",moderate:"Copper coats the sample",delayed:"Copper coats the sample after a delay"};
-  SOLIDS.forEach(function(k){
-    var e=Object.assign({},EL[k],{key:k});if(k==="C"&&carbonType==="graphite"){e.cond="good";e.lus=.45}
-    rows+='<tr><td>'+e.n+'</td><td>'+e.type+'</td><td>'+(e.lus>.7?"High":e.lus>.3?"Medium":"Dull")+'</td><td>'+lbl[e.cond]+'</td><td>'+(e.mall==="malleable"?"Flattens":"Shatters")+'</td><td>'+acid[e.acid]+'</td></tr>';
-  });
-  rows+='<tr><td>Oxygen, nitrogen, hydrogen</td><td>Nonmetal</td><td colspan="4">Colorless gases in sealed tubes (appearance only)</td></tr></tbody>';
-  $("#keyTable").innerHTML=rows;
-}
-$("#optAll").addEventListener("change",function(){allStations=this.checked;if(sel)setStation(station)});
-$("#optC").addEventListener("change",function(){carbonType=this.value;buildKey();if(sel)resetStation()});
 cv.addEventListener("pointermove",function(e){
   var r=cv.getBoundingClientRect();light.x=Math.max(-1,Math.min(1,((e.clientX-r.left)/r.width-.5)*2));light.y=Math.max(-1,Math.min(1,((e.clientY-r.top)/r.height-.5)*2));
 });
