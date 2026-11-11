@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hydrogen Peroxide by Permanganate Titration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF0F3; --panel:#FFFFFF; --ink:#18212B; --muted:#55616D; --line:#CBD3DB;
+  --accent:#6A1D6E; --accent-ink:#FFFFFF; --accent-soft:#F3E6F4;
+  --good:#1D6F48; --good-soft:#E2F2E9; --warn:#9A4300; --warn-soft:#FBEBDD;
+  --glass:#7B8A97; --glass-fill:rgba(205,222,234,.25); --steel:#9AA5B0; --steel-dark:#6E7A86;
+  --plate:#3A434C; --plate-top:#A9B3BC; --label:#18212B;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#13181D; --panel:#1C232A; --ink:#E6EBF0; --muted:#9BA7B3; --line:#323E49;
+    --accent:#D199DA; --accent-ink:#1B0D1C; --accent-soft:#2E2132;
+    --good:#7FD1A6; --good-soft:#18302A; --warn:#F2B27A; --warn-soft:#3A2817;
+    --glass:#A8B6C2; --glass-fill:rgba(160,185,205,.10); --steel:#6F7B87; --steel-dark:#56616C;
+    --plate:#0D1115; --plate-top:#56616C; --label:#E6EBF0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#13181D; --panel:#1C232A; --ink:#E6EBF0; --muted:#9BA7B3; --line:#323E49;
+  --accent:#D199DA; --accent-ink:#1B0D1C; --accent-soft:#2E2132;
+  --good:#7FD1A6; --good-soft:#18302A; --warn:#F2B27A; --warn-soft:#3A2817;
+  --glass:#A8B6C2; --glass-fill:rgba(160,185,205,.10); --steel:#6F7B87; --steel-dark:#56616C;
+  --plate:#0D1115; --plate-top:#56616C; --label:#E6EBF0;
+  color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,"Times New Roman",serif;font-weight:700;line-height:1.2;margin:0}
+header{max-width:1240px;margin:0 auto;padding:22px 20px 8px}
+header h1{font-size:clamp(1.5rem,3.2vw,2.15rem)}
+header p{margin:6px 0 0;color:var(--muted);max-width:70ch}
+.wrap{max-width:1240px;margin:0 auto;padding:12px 20px 40px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.tab{appearance:none;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-weight:700;padding:9px 16px;border-radius:999px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);gap:18px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.rigcard{padding:8px 8px 4px;position:relative}
+#rig{width:100%;max-height:78vh;display:block;margin:0 auto}
+.readouts{display:flex;gap:10px;flex-wrap:wrap;padding:4px 10px 10px}
+.readout{flex:1 1 140px;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.readout span{display:block;color:var(--muted);font-size:.85rem}
+.readout b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.side{display:flex;flex-direction:column;gap:14px}
+.side h2{font-size:1.15rem;margin-bottom:8px}
+.steps{display:flex;flex-direction:column;gap:6px}
+.step{display:flex;align-items:center;gap:10px;width:100%;text-align:left;appearance:none;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;padding:8px 10px;border-radius:10px;cursor:pointer}
+.step .box{flex:0 0 20px;height:20px;border-radius:6px;border:1.5px solid var(--muted);display:grid;place-items:center;font-size:.8rem}
+.step.done{border-color:var(--good);background:var(--good-soft)}
+.step.done .box{background:var(--good);border-color:var(--good);color:var(--panel)}
+.step:disabled{cursor:not-allowed;opacity:.5}
+.step.done:disabled{opacity:1}
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{appearance:none;border:1.5px solid var(--accent);background:var(--panel);color:var(--accent);font:inherit;font-weight:700;padding:10px 12px;border-radius:10px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.wide{grid-column:1 / -1}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.held{background:var(--accent);color:var(--accent-ink)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.status{min-height:3em;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:.95rem}
+.zoomwrap{display:flex;gap:14px;align-items:center}
+#zoom{width:150px;flex:0 0 150px;border:1px solid var(--line);border-radius:10px;background:var(--glass-fill)}
+.zoomnote{font-size:.9rem;color:var(--muted);margin:0}
+details{margin-top:4px}
+summary{cursor:pointer;font-weight:700}
+details ol{padding-left:1.2em;margin:.5em 0}
+details li{margin:.25em 0}
+.data{margin-top:18px}
+.data h2{font-size:1.25rem}
+.data p{color:var(--muted);margin:4px 0 10px;max-width:75ch}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:middle}
+th{font-size:.88rem;color:var(--muted);font-weight:700}
+td input{width:100%;max-width:120px;font:inherit;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+td input.ok{border-color:var(--good);background:var(--good-soft)}
+td input.bad{border-color:var(--warn);background:var(--warn-soft)}
+.empty{color:var(--muted);font-style:italic}
+.feedback{margin-top:10px;font-size:.95rem}
+.feedback li{margin:.2em 0}
+.datactl{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.datactl .btn{flex:0 0 auto}
+.teacher{margin-top:18px;border:2px dashed var(--accent)}
+
+.teacher table{min-width:0}
+.teacher input{max-width:110px;font:inherit;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.kmno4{fill:#4A0B52}
+.glass{fill:var(--glass-fill);stroke:var(--glass);stroke-width:1.6}
+.steel{fill:var(--steel)}
+.steeldk{fill:var(--steel-dark)}
+.tick{stroke:var(--label);stroke-width:.8}
+.ticklabel{fill:var(--label);font-size:9px;font-family:"Atkinson Hyperlegible",system-ui,sans-serif}
+.plate{fill:var(--plate)}
+.platetop{fill:var(--plate-top)}
+.platetext{fill:#FFB36B;font-size:11px;font-family:"Atkinson Hyperlegible",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.timer{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Hydrogen peroxide by permanganate titration</h1>
+  <p>Standardize a potassium permanganate solution against sodium oxalate, then use it to find the actual molarity of a drugstore bottle of hydrogen peroxide labeled 3% (about 0.88 M).</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist" aria-label="Lab parts">
+    <button class="tab" role="tab" id="tabA" aria-selected="true" data-part="A">Part A: Standardize KMnO₄</button>
+    <button class="tab" role="tab" id="tabB" aria-selected="false" data-part="B">Part B: Analyze the H₂O₂</button>
+  </div>
+
+  <div class="grid">
+    <div class="card rigcard">
+      <svg id="rig" viewBox="0 0 420 640" role="img" aria-label="Buret clamped above an Erlenmeyer flask on a hot plate stirrer">
+        <defs>
+          <clipPath id="flaskClip"><path d="M199 458 L199 500 L141 586 Q137 593 146 593 L274 593 Q283 593 279 586 L221 500 L221 458 Z"/></clipPath>
+          <clipPath id="buretClip"><rect x="203" y="22" width="14" height="392"/></clipPath>
+        </defs>
+        <!-- stand -->
+        <rect class="steel" x="36" y="622" width="310" height="12" rx="3"/>
+        <rect class="steel" x="64" y="30" width="8" height="594"/>
+        <rect class="steel" x="70" y="150" width="128" height="6"/>
+        <rect class="steeldk" x="194" y="140" width="32" height="26" rx="4"/>
+        <!-- buret liquid -->
+        <rect id="buretLiquid" class="kmno4" clip-path="url(#buretClip)" x="203" y="414" width="14" height="0"/>
+        <rect class="glass" x="202" y="20" width="16" height="396" rx="3"/>
+        <g id="buretTicks"></g>
+        <!-- stopcock & tip -->
+        <path class="glass" d="M204 416 L216 416 L214 424 L206 424 Z"/>
+        <rect id="tipLiquid" class="kmno4" x="207" y="416" width="6" height="0"/>
+        <rect class="steeldk" x="196" y="423" width="28" height="11" rx="3"/>
+        <rect id="handle" class="steel" x="224" y="425" width="22" height="7" rx="3" style="transform-box:fill-box;transform-origin:0% 50%"/>
+        <path class="glass" d="M206 434 L208.5 466 L211.5 466 L214 434 Z"/>
+        <!-- flask contents -->
+        <g clip-path="url(#flaskClip)">
+          <rect id="flaskLiquid" x="130" y="593" width="160" height="0"/>
+          <rect id="brown" x="130" y="593" width="160" height="0" fill="#6B3F14" opacity="0"/>
+          <ellipse id="blob" cx="210" cy="560" rx="18" ry="7" fill="#7A1A7E" opacity="0"/>
+          <g id="bubbles"></g>
+          <rect id="stirbar" x="198" y="584" width="24" height="6" rx="3" fill="#F4F6F8" stroke="#8892A0" stroke-width=".8"/>
+        </g>
+        <path class="glass" d="M199 458 L199 500 L141 586 Q137 593 146 593 L274 593 Q283 593 279 586 L221 500 L221 458 Z"/>
+        <rect class="glass" x="196" y="454" width="28" height="5" rx="2"/>
+        <!-- drops & stream -->
+        <line id="stream" x1="210" y1="466" x2="210" y2="466" stroke="#4A0B52" stroke-width="2" opacity="0"/>
+        <g id="drops"></g>
+        <!-- hot plate stirrer -->
+        <rect class="platetop" x="122" y="593" width="176" height="5" rx="2"/>
+        <rect id="glow" x="124" y="593" width="172" height="5" rx="2" fill="#FF6A2B" opacity="0"/>
+        <rect class="plate" x="118" y="598" width="184" height="24" rx="4"/>
+        <rect x="130" y="603" width="44" height="14" rx="2" fill="#101418"/>
+        <text id="plateTemp" class="platetext" x="170" y="614" text-anchor="end">22 °C</text>
+        <circle cx="262" cy="610" r="6" fill="#C8CED4"/><circle cx="284" cy="610" r="6" fill="#C8CED4"/>
+      </svg>
+      <div class="readouts">
+        <div class="readout"><span>Balance</span><b id="balance">0.0000 g</b></div>
+        <div class="readout"><span>Flask volume</span><b id="flaskVol">0 mL</b></div>
+        <div class="readout"><span>Unknown bottle code</span><b id="codeOut">0000</b></div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <h2 id="setupTitle">Set up trial 1</h2>
+        <div class="steps" id="stepsA">
+          <button class="step" id="sWeigh"><span class="box" aria-hidden="true"></span>Weigh sodium oxalate into the flask</button>
+          <button class="step" id="sWater"><span class="box" aria-hidden="true"></span>Add 50 mL distilled water</button>
+          <button class="step" id="sAcidA"><span class="box" aria-hidden="true"></span>Add 10 mL of 3 M H₂SO₄</button>
+          <button class="step" id="sHeat"><span class="box" aria-hidden="true"></span>Heat the flask to 80 °C</button>
+          <button class="step" id="sFillA"><span class="box" aria-hidden="true"></span>Fill the buret with KMnO₄</button>
+        </div>
+        <div class="steps" id="stepsB" hidden>
+          <button class="step" id="sDilute"><span class="box" aria-hidden="true"></span>Dilute: 10.00 mL of drugstore H₂O₂ to 250.00 mL</button>
+          <button class="step" id="sPipet"><span class="box" aria-hidden="true"></span>Pipet 25.00 mL of diluted H₂O₂ into the flask</button>
+          <button class="step" id="sAcidB"><span class="box" aria-hidden="true"></span>Add 10 mL of 3 M H₂SO₄</button>
+          <button class="step" id="sFillB"><span class="box" aria-hidden="true"></span>Fill the buret with KMnO₄</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Titrate</h2>
+        <div class="btnrow">
+          <button class="btn wide" id="bStream">Hold to open the stopcock</button>
+          <button class="btn" id="b1">Add 1.00 mL</button>
+          <button class="btn" id="bDrop">Add 1 drop</button>
+          <button class="btn" id="bHalf">Add ½ drop</button>
+          <button class="btn" id="bTimer">Start 30 s timer</button>
+          <button class="btn primary wide" id="bFinish">Stop at the endpoint</button>
+          <button class="btn wide" id="bNext" hidden>Set up the next trial</button>
+        </div>
+        <div class="status" id="status" role="status" aria-live="polite">Start with the setup steps above.</div>
+      </div>
+
+      <div class="card">
+        <h2>Buret close-up</h2>
+        <div class="zoomwrap">
+          <svg id="zoom" viewBox="0 0 160 200" aria-label="Magnified view of the buret scale at the liquid level"></svg>
+          <p class="zoomnote">Read the <strong>bottom</strong> of the meniscus at eye level. Estimate one digit past the smallest marking, to ±0.01 mL.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <details>
+          <summary>Procedure</summary>
+          <ol id="procA">
+            <li>Weigh a sodium oxalate sample into the flask and record its mass.</li>
+            <li>Dissolve it in water, acidify with sulfuric acid, and heat to about 80 °C.</li>
+            <li>Fill the buret and record the initial reading.</li>
+            <li>Add KMnO₄ until a faint pink color lasts 30 seconds. Go slowly near the end.</li>
+            <li>Record the final reading. Run at least two trials.</li>
+          </ol>
+          <ol id="procB" hidden>
+            <li>Make the dilution once: 10.00 mL of drugstore H₂O₂ diluted to 250.00 mL.</li>
+            <li>Pipet a 25.00 mL portion of the diluted solution into the flask and acidify it.</li>
+            <li>Record the initial buret reading.</li>
+            <li>Titrate to a faint pink that lasts 30 seconds, then record the final reading.</li>
+            <li>Run at least two trials.</li>
+          </ol>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <section class="card data" aria-labelledby="dataTitle">
+    <h2 id="dataTitle">Data table</h2>
+    <p>Type each value as soon as you have it: the mass and initial reading while you set up, the final reading when you stop. Check your readings after each trial.</p>
+    <div class="tablewrap" id="tableA">
+      <table>
+        <thead><tr><th>Trial</th><th>Mass Na₂C₂O₄ (g)</th><th>Initial buret (mL)</th><th>Final buret (mL)</th><th>Volume KMnO₄ (mL)</th></tr></thead>
+        <tbody id="bodyA"><tr><td colspan="5" class="empty">No trials finished yet.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="tablewrap" id="tableB" hidden>
+      <table>
+        <thead><tr><th>Trial</th><th>Diluted H₂O₂ titrated (mL)</th><th>Initial buret (mL)</th><th>Final buret (mL)</th><th>Volume KMnO₄ (mL)</th></tr></thead>
+        <tbody id="bodyB"><tr><td colspan="5" class="empty">No trials finished yet.</td></tr></tbody>
+      </table>
+    </div>
+    <div class="datactl">
+      <button class="btn" id="bCheck">Check my readings</button>
+      <button class="btn" id="bCopy">Copy data</button>
+    </div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+  </section>
+
+  <section class="card teacher" id="teacher" hidden aria-labelledby="tTitle">
+    <h2 id="tTitle">Teacher key</h2>
+    <p style="color:var(--muted)">Shown only when the page address ends in #teacher. Each student’s bottle code sets a hidden KMnO₄ molarity and H₂O₂ molarity.</p>
+    <p><label>Look up a bottle code: <input id="tCode" inputmode="numeric" maxlength="4"></label> <button class="btn" id="tGo">Show key</button></p>
+    <div id="tOut"></div>
+    <p style="margin-top:12px"><label>Assign this session a code: <input id="tSet" inputmode="numeric" maxlength="4"></label> <button class="btn" id="tSetGo">Use code</button></p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var MM_OX = 134.00, MM_H2O2 = 34.01;
+var DROP = 0.05;
+var BY0 = 40, PX_ML = 7.2; // buret scale: 0.00 mL at y=40, 50.00 mL at y=400
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function paramsFor(code){
+  var r = mulberry32((code*2654435761)>>>0); r(); r();
+  var M = 0.01850 + r()*0.00300;
+  var pct = 2.55 + r()*0.50;
+  return {M: Math.round(M*1e5)/1e5, pct: Math.round(pct*1000)/1000};
+}
+function rnd(a,b){return a+Math.random()*(b-a);}
+function r2(x){return Math.round(x*100)/100;}
+function fmt(x,d){return (Math.round(x*Math.pow(10,d))/Math.pow(10,d)).toFixed(d);}
+
+var S = {
+  code: 1000 + Math.floor(Math.random()*9000),
+  params: null,
+  part: "A",
+  dilutionDone: false,
+  buret: {filled:false, reading:0},
+  flasks: {A:null, B:null},
+  trials: {A:[], B:[]},
+  stream: false,
+  timerEnd: 0
+};
+S.params = paramsFor(S.code);
+
+function newFlask(part){
+  return {part:part, sample:false, mass:0, water:false, acid:false, heated:false,
+    temp:22, target:22, reductant:0, added:0, excess:0, reacted:0, brown:0,
+    vol:0, initial:null, finished:false, blob:0, maxExcess:0};
+}
+S.flasks.A = newFlask("A"); S.flasks.B = newFlask("B");
+function F(){return S.flasks[S.part];}
+
+var $ = function(id){return document.getElementById(id);};
+var statusEl = $("status");
+function say(t){statusEl.textContent = t;}
+
+/* ---------- buret ticks ---------- */
+(function(){
+  var g = $("buretTicks"), s = "";
+  for (var i=0;i<=50;i++){
+    var y = BY0 + i*PX_ML, len = (i%5===0)?7:4;
+    s += '<line class="tick" x1="203" x2="'+(203+len)+'" y1="'+y+'" y2="'+y+'"/>';
+    if (i%10===0) s += '<text class="ticklabel" x="222" y="'+(y+3)+'">'+i+'</text>';
+  }
+  g.innerHTML = s;
+})();
+
+/* ---------- color model ---------- */
+var STOPS = [
+  [0,      [214,230,242,0.30]],
+  [3e-6,   [246,214,230,0.50]],
+  [1.5e-5, [238,165,204,0.72]],
+  [6e-5,   [196,58,150,0.85]],
+  [2.5e-4, [108,20,110,0.93]],
+  [1e-3,   [58,8,64,0.97]]
+];
+function liquidColor(c){
+  if (c<=0) return STOPS[0][1];
+  for (var i=1;i<STOPS.length;i++){
+    if (c<=STOPS[i][0]){
+      var a=STOPS[i-1], b=STOPS[i], t;
+      if (a[0]===0) t = c/b[0]; else t = (Math.log(c)-Math.log(a[0]))/(Math.log(b[0])-Math.log(a[0]));
+      return a[1].map(function(v,k){return v+(b[1][k]-v)*t;});
+    }
+  }
+  return STOPS[STOPS.length-1][1];
+}
+function rgba(a){return "rgba("+Math.round(a[0])+","+Math.round(a[1])+","+Math.round(a[2])+","+a[3].toFixed(3)+")";}
+
+/* ---------- chemistry ---------- */
+function perMn(f){ return f.acid ? 2.5 : 1.5; }
+function rateK(f){
+  if (f.part==="B") return 3.0;
+  var T=f.temp, base = T>=70?2.5 : (T>=55?0.6:0.035);
+  var equiv = f.reductant/2.5;
+  var auto = equiv>0 ? 0.15 + 0.85*Math.min(1, f.reacted/(0.04*equiv)) : 1;
+  return base*auto;
+}
+function addTitrant(mL){
+  var f=F();
+  if (!canTitrate()) return;
+  var room = 50 - S.buret.reading;
+  if (room <= 0.0005){ say("The buret is empty. Record what you have, or refill before the next trial."); return; }
+  if (mL > room) mL = room;
+  if (f.initial===null) f.initial = S.buret.reading;
+  S.buret.reading += mL;
+  var mol = mL/1000*S.params.M;
+  f.added += mL; f.excess += mol; f.vol += mL;
+  f.blob = Math.min(1, f.blob + mol/2.5e-6);
+  if (!S.stream) spawnDrop();
+  if (S.buret.reading >= 49.999) say("The buret just ran dry.");
+}
+
+/* ---------- step logic ---------- */
+function canTitrate(){
+  var f=F();
+  if (f.finished || !S.buret.filled) return false;
+  if (f.part==="A") return f.sample && f.water;
+  return f.sample;
+}
+function stepWeigh(){
+  var f=F(); if (f.sample) return;
+  f.mass = Math.round(rnd(0.1600,0.2000)*1e4)/1e4;
+  f.reductant = f.mass/MM_OX; f.sample = true;
+  say("Sample transferred to the flask. Read the mass from the balance.");
+  update();
+}
+function stepWater(){ var f=F(); if (f.water) return; f.water=true; f.vol+=50; say("Added 50 mL of distilled water. The solid dissolves."); update(); }
+function stepAcid(){ var f=F(); if (f.acid) return; f.acid=true; f.vol+=10; say("Added 10 mL of 3 M sulfuric acid."); update(); }
+function stepHeat(){ var f=F(); if (f.heated) return; if(!f.water){say("Add the water first so there is something to heat.");return;} f.heated=true; f.target=80; say("Heating to 80 °C."); update(); }
+function stepFill(){
+  if (F().initial!==null && !F().finished){ say("You can’t refill in the middle of a trial."); return; }
+  S.buret.filled = true; S.buret.reading = r2(rnd(0.20,1.80));
+  say("Buret filled and the tip cleared of air. Read the initial level in the close-up.");
+  update();
+}
+function stepDilute(){ if (S.dilutionDone) return; S.dilutionDone = true; say("10.00 mL of drugstore H₂O₂ pipetted into a 250.00 mL volumetric flask, diluted to the mark, and mixed."); update(); }
+function stepPipet(){
+  var f=F(); if (f.sample) return;
+  if (!S.dilutionDone){ say("Make the dilution first."); return; }
+  f.sample = true; f.water = true; f.vol += 25;
+  f.reductant = (S.params.pct/100 * 1.000)/MM_H2O2; // 25.00 of 250.00 mL holds 1.000 mL of the original
+  say("25.00 mL of diluted H₂O₂ pipetted into the flask.");
+  update();
+}
+function finishTrial(){
+  var f=F();
+  if (f.initial===null){ say("Add some titrant before you stop."); return; }
+  stopStream();
+  f.finished = true;
+  var dropMol = DROP/1000*S.params.M;
+  S.trials[S.part].push({
+    mass: f.mass, initial: f.initial, final: S.buret.reading,
+    vol: f.part==="B" ? 25.00 : null,
+    excessDrops: (f.added/1000*S.params.M - f.reductant/perMn(f))/dropMol, brown: f.brown>1e-7, cold: f.part==="A" && f.temp<55,
+    undertitrated: (f.reductant/perMn(f) - f.added/1000*S.params.M) > 0.3*dropMol
+  });
+  say("Trial recorded. Read the final level in the close-up and enter your data in the table.");
+  renderTable(); update(); renderTeacher();
+}
+function refillBuret(){ S.buret.filled = true; S.buret.reading = r2(rnd(0.20,1.80)); }
+function nextTrial(){
+  S.flasks[S.part] = newFlask(S.part);
+  refillBuret();
+  say(S.part==="A" ? "Clean flask ready and the buret refilled with KMnO₄. Read the new initial level, then weigh a new sodium oxalate sample." : "Clean flask ready and the buret refilled with KMnO₄. Read the new initial level, then pipet another portion of the diluted H₂O₂.");
+  update();
+}
+
+/* ---------- stream & timer ---------- */
+function startStream(e){ if(e) e.preventDefault(); if(!canTitrate()) return; S.stream = true; $("bStream").classList.add("held"); }
+function stopStream(){ S.stream = false; $("bStream").classList.remove("held"); }
+function startTimer(){ S.timerEnd = performance.now()+30000; }
+
+/* ---------- drops & bubbles ---------- */
+var drops = [], bubbles = [];
+function spawnDrop(){ drops.push({y:466, v:0}); }
+function levelY(f){ return f.vol>0 ? 593 - (6 + f.vol*0.42) : 593; }
+
+/* ---------- render ---------- */
+function renderRig(dt){
+  var f=F();
+  // buret
+  var bl = $("buretLiquid"), tl = $("tipLiquid");
+  if (S.buret.filled && S.buret.reading<50){
+    var y = BY0 + S.buret.reading*PX_ML;
+    bl.setAttribute("y", y); bl.setAttribute("height", Math.max(0,416-y));
+    tl.setAttribute("height", 8);
+  } else { bl.setAttribute("height",0); tl.setAttribute("height", S.buret.filled?8:0); }
+  $("handle").style.transform = S.stream ? "rotate(-70deg)" : "rotate(0deg)";
+  // flask
+  var ly = levelY(f), fl=$("flaskLiquid");
+  fl.setAttribute("y", ly); fl.setAttribute("height", Math.max(0,593-ly));
+  var conc = f.vol>0 ? f.excess/(f.vol/1000) : 0;
+  fl.setAttribute("fill", f.vol>0 ? rgba(liquidColor(conc)) : "transparent");
+  var br=$("brown"), bc = f.vol>0 ? f.brown/(f.vol/1000) : 0;
+  br.setAttribute("y", ly); br.setAttribute("height", Math.max(0,593-ly));
+  br.setAttribute("opacity", Math.min(0.8, bc/1.5e-4).toFixed(3));
+  var bo=$("blob"); bo.setAttribute("cy", ly+10); bo.setAttribute("opacity", (f.vol>0? f.blob*0.9 : 0).toFixed(3));
+  // stir bar spin
+  var t = performance.now()/1000, w = 24*Math.abs(Math.cos(t*9));
+  var sb=$("stirbar"); sb.setAttribute("x", 210-w/2-1); sb.setAttribute("width", w+2);
+  sb.setAttribute("opacity", f.vol>0?1:0.6);
+  // stream
+  var st=$("stream");
+  if (S.stream){ st.setAttribute("y2", ly); st.setAttribute("opacity",1);} else st.setAttribute("opacity",0);
+  // drops
+  var dg = "", keep=[];
+  drops.forEach(function(d){ d.v += 900*dt; d.y += d.v*dt; if (d.y < ly){ keep.push(d); dg += '<ellipse cx="210" cy="'+d.y.toFixed(1)+'" rx="2.6" ry="3.4" fill="#4A0B52"/>'; } });
+  drops = keep; $("drops").innerHTML = dg;
+  // bubbles
+  var bg="", kb=[];
+  bubbles.forEach(function(b){ b.y -= b.s*dt; b.x += Math.sin(b.y/6)*0.3; if (b.y > ly+2){ kb.push(b); bg += '<circle cx="'+b.x.toFixed(1)+'" cy="'+b.y.toFixed(1)+'" r="'+b.r+'" fill="none" stroke="rgba(255,255,255,.85)" stroke-width=".8"/>'; } });
+  bubbles = kb; $("bubbles").innerHTML = bg;
+  // hot plate
+  $("plateTemp").textContent = Math.round(f.temp)+" °C";
+  $("glow").setAttribute("opacity", f.target>30 ? (0.35+0.25*Math.sin(t*3)).toFixed(2) : 0);
+  // readouts
+  $("balance").textContent = f.part==="A" ? f.mass.toFixed(4)+" g" : "not used";
+  $("flaskVol").textContent = f.vol>0 ? "about "+Math.round(f.vol)+" mL" : "empty";
+  $("codeOut").textContent = S.code;
+}
+
+function renderZoom(){
+  var z = $("zoom"), s = "";
+  if (!S.buret.filled){
+    z.innerHTML = '<rect x="50" y="0" width="80" height="200" fill="none" stroke="var(--glass)" stroke-width="2"/><text x="90" y="104" text-anchor="middle" class="ticklabel" style="font-size:11px">Buret empty</text>';
+    return;
+  }
+  var r = S.buret.reading, cy = 100, px = 70;
+  // liquid with a shallow concave meniscus; the bottom of the curve (center of the tube) is the reading
+  var mPath = 'M50 '+(cy-5)+' Q90 '+(cy+5)+' 130 '+(cy-5)+' L130 200 L50 200 Z';
+  if (r < 50){
+    s += '<defs><clipPath id="zLiquid"><path d="'+mPath+'"/></clipPath></defs>';
+    s += '<path d="'+mPath+'" fill="#6A1E72"/>';
+  }
+  var ticks = "";
+  var lo = Math.floor((r-1.5)*10), hi = Math.ceil((r+1.5)*10);
+  for (var v=lo; v<=hi; v++){
+    if (v<0 || v>500) continue;
+    // graduation lines run across the tube so the bottom of the meniscus can be lined up with them
+    var y = cy + (v/10 - r)*px, len = (v%10===0)?80:((v%5===0)?65:52);
+    ticks += '<line x1="50" x2="'+(50+len)+'" y1="'+y.toFixed(2)+'" y2="'+y.toFixed(2)+'"'+((v%10===0)?' stroke-width="1.6"':'')+'/>';
+    if (v%10===0) s += '<text x="44" y="'+(y+4).toFixed(2)+'" text-anchor="end" class="ticklabel" style="font-size:12px;font-weight:700">'+(v/10)+'</text>';
+  }
+  s += '<g stroke="var(--label)" stroke-width="1">'+ticks+'</g>';
+  if (r < 50) s += '<g clip-path="url(#zLiquid)" stroke="#FFFFFF" stroke-width="1" opacity=".9">'+ticks+'</g>';
+  s += '<line x1="50" x2="50" y1="0" y2="200" stroke="var(--glass)" stroke-width="2"/><line x1="130" x2="130" y1="0" y2="200" stroke="var(--glass)" stroke-width="2"/>';
+  z.innerHTML = s;
+}
+var lastZoom = -1, lastFilled = null;
+
+function setStep(id, done, enabled){
+  var b=$(id); b.classList.toggle("done", !!done); b.disabled = !enabled || !!done;
+  b.querySelector(".box").textContent = done ? "✓" : "";
+}
+function update(){
+  renderTable();
+  var f=F(), A = S.part==="A", mid = f.initial!==null && !f.finished;
+  $("stepsA").hidden = !A; $("stepsB").hidden = A;
+  $("procA").hidden = !A; $("procB").hidden = A;
+  $("tableA").hidden = !A; $("tableB").hidden = A;
+  var n = S.trials[S.part].length + (f.finished?0:1);
+  $("setupTitle").textContent = f.finished ? "Trial "+S.trials[S.part].length+" finished" : "Set up trial "+n;
+  setStep("sWeigh", f.sample, !f.finished);
+  setStep("sWater", f.water, !f.finished);
+  setStep("sAcidA", f.acid, !f.finished);
+  setStep("sHeat", f.heated, !f.finished && f.water);
+  setStep("sDilute", S.dilutionDone, true);
+  setStep("sPipet", f.sample, !f.finished && S.dilutionDone);
+  setStep("sAcidB", f.acid, !f.finished);
+  var fillLabel = (S.buret.filled && !mid) ? "Refill the buret with KMnO₄" : "Fill the buret with KMnO₄";
+  ["sFillA","sFillB"].forEach(function(id){
+    var b=$(id); b.lastChild.textContent = fillLabel;
+    b.classList.toggle("done", S.buret.filled);
+    b.querySelector(".box").textContent = S.buret.filled ? "✓" : "";
+    b.disabled = mid || f.finished;
+  });
+  var ok = canTitrate();
+  ["bStream","b1","bDrop","bHalf","bTimer"].forEach(function(id){ $(id).disabled = !ok; });
+  $("bFinish").disabled = !(ok && f.initial!==null);
+  $("bFinish").hidden = f.finished; $("bNext").hidden = !f.finished;
+  $("bNext").disabled = S.trials[S.part].length >= 4;
+  if (S.trials[S.part].length >= 4 && f.finished) $("bNext").textContent = "Four trials is the limit";
+  else $("bNext").textContent = "Set up the next trial";
+}
+
+/* ---------- data table ---------- */
+function renderTable(){
+  ["A","B"].forEach(function(p){
+    var body = $("body"+p), rows = S.trials[p];
+    // one row per finished trial, plus a row for the trial in progress so readings can be typed as they happen
+    var count = rows.length + (S.flasks[p].finished ? 0 : 1);
+    if (!count) return;
+    var existing = body.querySelectorAll("tr[data-i]").length;
+    if (existing===0) body.innerHTML = "";
+    for (var i=existing;i<count;i++){
+      var tr = document.createElement("tr"); tr.setAttribute("data-i", i);
+      var first = p==="A" ? '<td><input aria-label="Trial '+(i+1)+' mass" data-k="mass" inputmode="decimal"></td>'
+                          : '<td>25.00</td>';
+      tr.innerHTML = '<td>'+(i+1)+'</td>'+first+
+        '<td><input aria-label="Trial '+(i+1)+' initial reading" data-k="initial" inputmode="decimal"></td>'+
+        '<td><input aria-label="Trial '+(i+1)+' final reading" data-k="final" inputmode="decimal"></td>'+
+        '<td><input aria-label="Trial '+(i+1)+' volume" data-k="volume" inputmode="decimal"></td>';
+      body.appendChild(tr);
+    }
+  });
+}
+function checkData(){
+  var p = S.part, rows = S.trials[p], out = [], body = $("body"+p);
+  if (!rows.length){ $("feedback").innerHTML = "<p>Finish a trial first.</p>"; return; }
+  rows.forEach(function(t,i){
+    var tr = body.querySelector('tr[data-i="'+i+'"]'); if(!tr) return;
+    var get = function(k){ var el = tr.querySelector('input[data-k="'+k+'"]'); return el ? el : null; };
+    var msgs = [];
+    function mark(el, good){ el.classList.toggle("ok", good); el.classList.toggle("bad", !good); }
+    if (p==="A"){
+      var m = get("mass"), mv = parseFloat(m.value);
+      var mg = !isNaN(mv) && Math.abs(mv - t.mass) < 0.00005; mark(m, mg);
+      if (!mg) msgs.push("mass doesn’t match the balance");
+    }
+    var ini = get("initial"), fin = get("final"), vol = get("volume");
+    var iv = parseFloat(ini.value), fv = parseFloat(fin.value), vv = parseFloat(vol.value);
+    var ig = !isNaN(iv) && Math.abs(iv - t.initial) <= 0.021 && /\.\d\d$/.test(ini.value.trim());
+    var fg = !isNaN(fv) && Math.abs(fv - t.final) <= 0.021 && /\.\d\d$/.test(fin.value.trim());
+    var vg = !isNaN(vv) && !isNaN(iv) && !isNaN(fv) && Math.abs(vv - (fv-iv)) < 0.006;
+    mark(ini, ig); mark(fin, fg); mark(vol, vg);
+    if (!ig) msgs.push("initial reading is off (read the bottom of the meniscus, to two decimal places)");
+    if (!fg) msgs.push("final reading is off (read the bottom of the meniscus, to two decimal places)");
+    if (!vg) msgs.push("volume should equal final minus initial");
+    if (t.brown) msgs.push("a brown solid formed during this trial, so its result can’t be trusted");
+    if (t.cold) msgs.push("the solution was below 55 °C, so the pink faded slowly and the endpoint may be early");
+    if (t.excessDrops > 3) msgs.push("the endpoint color was darker than faint pink, so this trial overshot by about "+Math.round(t.excessDrops)+" drops");
+    else if (t.undertitrated) msgs.push("there was still unreacted sample in the flask when you stopped, so this trial stopped short of the endpoint");
+    out.push("<li><strong>Trial "+(i+1)+":</strong> "+(msgs.length ? msgs.join("; ")+"." : "all values check out.")+"</li>");
+  });
+  $("feedback").innerHTML = "<ul>"+out.join("")+"</ul>";
+}
+function copyData(){
+  var lines = ["Bottle code: "+S.code];
+  ["A","B"].forEach(function(p){
+    var body=$("body"+p);
+    lines.push(p==="A" ? "Part A: Standardization (mass Na2C2O4 g, initial mL, final mL, volume mL)" : "Part B: H2O2 (aliquot mL, initial mL, final mL, volume mL)");
+    body.querySelectorAll("tr[data-i]").forEach(function(tr){
+      var vals = [].map.call(tr.querySelectorAll("td"), function(td){ var inp=td.querySelector("input"); return inp ? (inp.value||"—") : td.textContent; });
+      lines.push(vals.join("\t"));
+    });
+  });
+  var text = lines.join("\n");
+  try { navigator.clipboard.writeText(text).then(function(){ say("Data copied to the clipboard."); }, function(){ say("Copy failed. Select the table and copy it by hand."); }); }
+  catch(e){ say("Copy isn’t available here. Select the table and copy it by hand."); }
+}
+
+/* ---------- teacher ---------- */
+function keyHTML(code){
+  var p = paramsFor(code);
+  var molMn = (p.pct/100)/MM_H2O2*0.4;
+  var vB = molMn/p.M*1000;
+  var vA = (0.1800/MM_OX)*0.4/p.M*1000;
+  return '<table><tbody>'+
+    '<tr><th>Bottle code</th><td>'+code+'</td></tr>'+
+    '<tr><th>True KMnO₄ molarity</th><td>'+p.M.toFixed(5)+' M</td></tr>'+
+    '<tr><th>True H₂O₂ molarity, original bottle</th><td>'+(p.pct*10/MM_H2O2).toFixed(3)+' M</td></tr>'+
+    '<tr><th>True H₂O₂ molarity, diluted solution</th><td>'+(p.pct*10/MM_H2O2/25).toFixed(4)+' M</td></tr>'+
+    '<tr><th>Expected Part A volume for 0.1800 g Na₂C₂O₄</th><td>'+vA.toFixed(2)+' mL</td></tr>'+
+    '<tr><th>Expected Part B volume per 25.00 mL portion</th><td>'+vB.toFixed(2)+' mL</td></tr>'+
+    '</tbody></table>';
+}
+function renderTeacher(){
+  if ($("teacher").hidden) return;
+  var h = keyHTML(S.code);
+  ["A","B"].forEach(function(p){
+    if (!S.trials[p].length) return;
+    h += '<h3 style="margin-top:12px;font-size:1rem">This session, Part '+p+' true readings</h3><ul>';
+    S.trials[p].forEach(function(t,i){
+      h += "<li>Trial "+(i+1)+": "+(p==="A"?"mass "+t.mass.toFixed(4)+" g, ":"")+"initial "+fmt(t.initial,3)+", final "+fmt(t.final,3)+" mL"+(t.excessDrops>3?" (overshot about "+Math.round(t.excessDrops)+" drops)":"")+"</li>";
+    });
+    h += "</ul>";
+  });
+  $("tOut").innerHTML = h;
+}
+function checkHash(){
+  var on = location.hash === "#teacher";
+  $("teacher").hidden = !on;
+  if (on) renderTeacher();
+}
+
+/* ---------- events ---------- */
+$("tabA").onclick = $("tabB").onclick = function(){
+  stopStream(); S.part = this.getAttribute("data-part");
+  var refilled = false;
+  if (S.buret.filled && F().initial===null && !F().finished){ refillBuret(); refilled = true; }
+  $("tabA").setAttribute("aria-selected", S.part==="A"); $("tabB").setAttribute("aria-selected", S.part==="B");
+  $("feedback").innerHTML = "";
+  say((S.part==="A" ? "Part A: find the exact molarity of the KMnO₄." : "Part B: use your standardized KMnO₄ on the diluted drugstore peroxide.") + (refilled ? " The buret has been refilled, so read the new initial level." : ""));
+  update();
+};
+$("sWeigh").onclick = stepWeigh; $("sWater").onclick = stepWater; $("sAcidA").onclick = stepAcid;
+$("sHeat").onclick = stepHeat; $("sFillA").onclick = stepFill; $("sFillB").onclick = stepFill;
+$("sDilute").onclick = stepDilute; $("sPipet").onclick = stepPipet; $("sAcidB").onclick = stepAcid;
+$("b1").onclick = function(){ addTitrant(1.00); update(); };
+$("bDrop").onclick = function(){ addTitrant(DROP); update(); };
+$("bHalf").onclick = function(){ addTitrant(DROP/2); say("Half a drop hung from the tip, then you rinsed it into the flask with distilled water."); update(); };
+$("bTimer").onclick = startTimer;
+$("bFinish").onclick = finishTrial;
+$("bNext").onclick = nextTrial;
+$("bCheck").onclick = checkData;
+$("bCopy").onclick = copyData;
+var sb = $("bStream");
+sb.addEventListener("pointerdown", startStream);
+["pointerup","pointerleave","pointercancel"].forEach(function(ev){ sb.addEventListener(ev, function(){ stopStream(); update(); }); });
+sb.addEventListener("keydown", function(e){ if(e.key===" "||e.key==="Enter"){ if(!S.stream) startStream(e); }});
+sb.addEventListener("keyup", function(e){ if(e.key===" "||e.key==="Enter"){ stopStream(); update(); }});
+$("tGo").onclick = function(){ var c=parseInt($("tCode").value,10); if(c>=1000&&c<=9999) $("tOut").innerHTML = keyHTML(c); };
+$("tSetGo").onclick = function(){
+  var c=parseInt($("tSet").value,10); if(!(c>=1000&&c<=9999)) return;
+  S.code=c; S.params=paramsFor(c); S.trials={A:[],B:[]}; S.flasks={A:newFlask("A"),B:newFlask("B")};
+  S.dilutionDone=false; S.buret={filled:false,reading:0};
+  $("bodyA").innerHTML=$("bodyB").innerHTML='<tr><td colspan="5" class="empty">No trials finished yet.</td></tr>';
+  say("Session reset with bottle code "+c+"."); update(); renderTeacher();
+};
+window.addEventListener("hashchange", checkHash);
+
+/* ---------- loop ---------- */
+var last = performance.now(), noticeCold = false, noticeBrown = false;
+function loop(now){
+  var dt = Math.min(0.1, (now-last)/1000); last = now;
+  var f = F();
+  if (S.stream){
+    if (canTitrate()) addTitrant(1.2*dt); else stopStream();
+    if (S.buret.reading >= 49.999) stopStream();
+  }
+  // temperature
+  f.temp += (f.target - f.temp)*(1-Math.exp(-dt/2.5));
+  // reaction
+  if (f.excess > 0){
+    var maxR = (f.reductant - f.reacted*perMn(f))/perMn(f);
+    if (maxR > 0){
+      var d = Math.min(maxR, f.excess*(1-Math.exp(-rateK(f)*dt)));
+      f.excess -= d; f.reacted += d;
+      if (!f.acid) f.brown += d;
+      if (d > 2e-8 && Math.random() < Math.min(0.9, d/4e-7)){
+        bubbles.push({x:180+Math.random()*60, y:588, r:(1.2+Math.random()*1.8).toFixed(1), s:40+Math.random()*30});
+      }
+    }
+  }
+  f.blob *= Math.exp(-dt*2.2);
+  if (f.part==="A" && f.initial!==null && f.temp<55 && !noticeCold && f.added>0.5){ noticeCold=true; say("The pink color is slow to fade at this temperature."); }
+  if (f.brown>2e-6 && !noticeBrown){ noticeBrown=true; say("A brown solid is clouding the flask."); }
+  if (f.initial===null){ noticeCold=false; noticeBrown=false; }
+  // timer
+  if (S.timerEnd){
+    var left = Math.ceil((S.timerEnd-now)/1000);
+    $("bTimer").textContent = left>0 ? "Timer: "+left+" s" : "30 s are up";
+    if (left <= -3){ S.timerEnd = 0; $("bTimer").textContent = "Start 30 s timer"; }
+  }
+  renderRig(dt);
+  if (S.buret.reading !== lastZoom || S.buret.filled !== lastFilled){ renderZoom(); lastZoom = S.buret.reading; lastFilled = S.buret.filled; }
+  requestAnimationFrame(loop);
+}
+update(); checkHash(); renderZoom();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
