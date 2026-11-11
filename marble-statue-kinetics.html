@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How Long Will That Marble Statue Last? A Kinetics Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1F2; --panel:#FFFFFF; --ink:#172126; --muted:#56646B; --line:#CCD5D9;
+  --accent:#1D5C68; --accent-ink:#FFFFFF; --accent-soft:#E2EFF1;
+  --good:#1D6F48; --good-soft:#E2F2E9; --warn:#9A4300; --warn-soft:#FBEBDD;
+  --glass:#7B8A97; --glass-fill:rgba(205,222,234,.25); --steel:#9AA5B0; --steel-dark:#5E6A75;
+  --label:#172126; --acid:rgba(196,224,236,.75); --grid:#E2E7EA; --plot:#1D5C68;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12181B; --panel:#1B2327; --ink:#E5ECEF; --muted:#9AA9B0; --line:#31404A;
+    --accent:#7CC4CF; --accent-ink:#0D1F23; --accent-soft:#1D3236;
+    --good:#7FD1A6; --good-soft:#18302A; --warn:#F2B27A; --warn-soft:#3A2817;
+    --glass:#A8B6C2; --glass-fill:rgba(160,185,205,.10); --steel:#6F7B87; --steel-dark:#4B5660;
+    --label:#E5ECEF; --acid:rgba(120,170,195,.45); --grid:#2A363D; --plot:#7CC4CF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12181B; --panel:#1B2327; --ink:#E5ECEF; --muted:#9AA9B0; --line:#31404A;
+  --accent:#7CC4CF; --accent-ink:#0D1F23; --accent-soft:#1D3236;
+  --good:#7FD1A6; --good-soft:#18302A; --warn:#F2B27A; --warn-soft:#3A2817;
+  --glass:#A8B6C2; --glass-fill:rgba(160,185,205,.10); --steel:#6F7B87; --steel-dark:#4B5660;
+  --label:#E5ECEF; --acid:rgba(120,170,195,.45); --grid:#2A363D; --plot:#7CC4CF;
+  color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3{font-family:"Source Serif 4",Georgia,"Times New Roman",serif;font-weight:700;line-height:1.2;margin:0}
+header{max-width:1240px;margin:0 auto;padding:22px 20px 8px}
+header h1{font-size:clamp(1.5rem,3.2vw,2.15rem)}
+header p{margin:6px 0 0;color:var(--muted);max-width:72ch}
+.wrap{max-width:1240px;margin:0 auto;padding:12px 20px 40px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.tab{appearance:none;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-weight:700;padding:9px 16px;border-radius:999px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);gap:18px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.side{display:flex;flex-direction:column;gap:14px}
+.side h2,.card h2{font-size:1.15rem;margin-bottom:8px}
+#rig{width:100%;max-height:60vh;display:block;margin:0 auto}
+.readouts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:6px 4px 4px}
+@media (max-width:600px){.readouts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.readout{border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.readout span{display:block;color:var(--muted);font-size:.82rem}
+.readout b{font-size:1.15rem;font-variant-numeric:tabular-nums}
+label.field{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.95rem;margin-bottom:10px}
+select{font:inherit;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+select:disabled{opacity:.55}
+.fixed{font-size:.92rem;color:var(--muted);margin:0 0 10px}
+.steps{display:flex;flex-direction:column;gap:6px}
+.step{display:flex;align-items:center;gap:10px;width:100%;text-align:left;appearance:none;border:1.5px solid var(--line);background:transparent;color:var(--ink);font:inherit;padding:8px 10px;border-radius:10px;cursor:pointer}
+.step .box{flex:0 0 20px;height:20px;border-radius:6px;border:1.5px solid var(--muted);display:grid;place-items:center;font-size:.8rem}
+.step.done{border-color:var(--good);background:var(--good-soft)}
+.step.done .box{background:var(--good);border-color:var(--good);color:var(--panel)}
+.step:disabled{cursor:not-allowed;opacity:.5}
+.step.done:disabled{opacity:1}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{appearance:none;border:1.5px solid var(--accent);background:var(--panel);color:var(--accent);font:inherit;font-weight:700;padding:9px 12px;border-radius:10px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.on{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.speed{display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.speed span{font-size:.92rem;color:var(--muted);margin-right:4px}
+button:focus-visible,select:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.status{min-height:3em;margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:.95rem}
+details ol{padding-left:1.2em;margin:.5em 0}
+details li{margin:.25em 0}
+summary{cursor:pointer;font-weight:700}
+.lower{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px}
+@media (max-width:880px){.lower{grid-template-columns:1fr}}
+#chart{width:100%;display:block}
+.note{color:var(--muted);font-size:.92rem;margin:4px 0 10px}
+.tablewrap{overflow-x:auto;max-height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--line);padding:6px 10px;text-align:right}
+th{position:sticky;top:0;background:var(--panel);font-size:.86rem;color:var(--muted)}
+th:first-child,td:first-child{text-align:left}
+.trialbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.trialbar select{flex:1 1 200px}
+.teacher{margin-top:18px;border:2px dashed var(--accent)}
+.teacher table th,.teacher table td{text-align:left}
+.glass{fill:var(--glass-fill);stroke:var(--glass);stroke-width:1.6}
+.steel{fill:var(--steel)}
+.steeldk{fill:var(--steel-dark)}
+.lcd{fill:#0F1A12}
+.lcdtext{fill:#8EF5A6;font-family:"Atkinson Hyperlegible",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.axis{stroke:var(--muted);stroke-width:1}
+.gridline{stroke:var(--grid);stroke-width:1}
+.axlabel{fill:var(--muted);font-size:11px;font-family:"Atkinson Hyperlegible",system-ui,sans-serif}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<header>
+  <h1>How long will that marble statue last?</h1>
+  <p>Marble is mostly calcium carbonate, and acid rain slowly dissolves it. Measure how fast CaCO₃ reacts with hydrochloric acid by tracking the mass of CO₂ that escapes, then find the rate law and test how surface area and temperature change the rate.</p>
+</header>
+
+<div class="wrap">
+  <div class="tabs" role="tablist" aria-label="Lab parts">
+    <button class="tab" role="tab" id="tabA" aria-selected="true" data-part="A">Part A: Concentration of HCl</button>
+    <button class="tab" role="tab" id="tabB" aria-selected="false" data-part="B">Part B: Surface area and temperature</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <svg id="rig" viewBox="0 0 520 360" role="img" aria-label="Erlenmeyer flask of acid on an electronic balance, with a weighing boat on a second balance">
+        <defs>
+          <clipPath id="flaskClip"><path d="M228 118 L228 168 L170 262 Q166 270 175 270 L345 270 Q354 270 350 262 L292 168 L292 118 Z"/></clipPath>
+        </defs>
+        <!-- bench -->
+        <rect x="0" y="330" width="520" height="30" fill="var(--line)" opacity=".5"/>
+        <!-- main balance -->
+        <rect class="steeldk" x="150" y="276" width="220" height="54" rx="8"/>
+        <rect class="steel" x="168" y="270" width="184" height="8" rx="3"/>
+        <rect class="lcd" x="196" y="290" width="128" height="28" rx="4"/>
+        <text id="lcdMain" class="lcdtext" x="316" y="311" text-anchor="end" font-size="18">0.000 g</text>
+        <!-- flask contents -->
+        <g clip-path="url(#flaskClip)">
+          <rect id="acid" x="160" y="270" width="200" height="0" fill="var(--acid)"/>
+          <rect id="foam" x="160" y="270" width="200" height="0" fill="#FFFFFF" opacity="0"/>
+          <g id="solid"></g>
+          <g id="bubbles"></g>
+        </g>
+        <path class="glass" d="M228 118 L228 168 L170 262 Q166 270 175 270 L345 270 Q354 270 350 262 L292 168 L292 118 Z"/>
+        <rect class="glass" x="223" y="113" width="74" height="6" rx="2"/>
+        <!-- cotton plug -->
+        <g id="cotton" opacity="0">
+          <ellipse cx="260" cy="114" rx="20" ry="9" fill="#F7F7F2" stroke="#C9C9BE"/>
+          <ellipse cx="252" cy="108" rx="9" ry="6" fill="#FAFAF6" stroke="#D3D3C8"/>
+          <ellipse cx="268" cy="109" rx="8" ry="6" fill="#FAFAF6" stroke="#D3D3C8"/>
+        </g>
+        <!-- side balance with weighing boat -->
+        <rect class="steeldk" x="392" y="296" width="116" height="34" rx="6"/>
+        <rect class="steel" x="402" y="290" width="96" height="7" rx="3"/>
+        <rect class="lcd" x="408" y="304" width="84" height="20" rx="3"/>
+        <text id="lcdBoat" class="lcdtext" x="486" y="319" text-anchor="end" font-size="13">0.000 g</text>
+        <path id="boat" d="M412 290 L420 278 L480 278 L488 290 Z" fill="#E9EEF2" stroke="var(--glass)" stroke-width="1.2"/>
+        <g id="boatSolid"></g>
+        <!-- HCl bottle -->
+        <g id="bottle">
+          <rect x="40" y="226" width="64" height="104" rx="10" fill="var(--glass-fill)" stroke="var(--glass)" stroke-width="1.6"/>
+          <rect x="58" y="206" width="28" height="22" rx="3" fill="var(--steel-dark)"/>
+          <rect x="44" y="250" width="56" height="40" rx="4" fill="var(--panel)" stroke="var(--line)"/>
+          <text id="bottleLabel" x="72" y="268" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)" font-family="Atkinson Hyperlegible,system-ui,sans-serif">2.0 M</text>
+          <text x="72" y="283" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="Atkinson Hyperlegible,system-ui,sans-serif">HCl</text>
+        </g>
+        <!-- thermometer readout -->
+        <g>
+          <rect x="34" y="30" width="118" height="40" rx="8" fill="var(--panel)" stroke="var(--line)"/>
+          <text x="46" y="47" font-size="11" fill="var(--muted)" font-family="Atkinson Hyperlegible,system-ui,sans-serif">Acid temperature</text>
+          <text id="tempOut" x="46" y="63" font-size="15" font-weight="700" fill="var(--ink)" font-family="Atkinson Hyperlegible,system-ui,sans-serif">25 °C</text>
+        </g>
+      </svg>
+      <div class="readouts">
+        <div class="readout"><span>Timer</span><b id="timerOut">0 s</b></div>
+        <div class="readout"><span>Flask + cotton balance</span><b id="mainOut">0.000 g</b></div>
+        <div class="readout"><span>Weighing boat</span><b id="boatOut">0.000 g</b></div>
+        <div class="readout"><span>Trials saved</span><b id="countOut">0</b></div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <h2 id="setupTitle">Set up the trial</h2>
+        <div id="choiceA">
+          <label class="field">HCl concentration
+            <select id="selConc"><option value="1">1.0 M</option><option value="2" selected>2.0 M</option><option value="3">3.0 M</option><option value="4">4.0 M</option></select>
+          </label>
+          <p class="fixed">Held constant: about 2 g of small marble chips, 25.0 mL of acid, 25 °C.</p>
+        </div>
+        <div id="choiceB" hidden>
+          <label class="field">Form of CaCO₃
+            <select id="selSize"><option value="large">Large marble chips</option><option value="small" selected>Small marble chips</option><option value="powder">Powdered CaCO₃</option></select>
+          </label>
+          <label class="field">Acid temperature
+            <select id="selTemp"><option value="25" selected>25 °C (room temperature)</option><option value="35">35 °C (warm water bath)</option><option value="45">45 °C (warm water bath)</option></select>
+          </label>
+          <p class="fixed">Held constant: about 2 g of CaCO₃ and 25.0 mL of 2.0 M HCl. Change only one variable from the standard trial (small chips, 25 °C).</p>
+        </div>
+        <div class="steps">
+          <button class="step" id="sPour"><span class="box" aria-hidden="true"></span>Pour 25.0 mL of HCl into the flask on the balance</button>
+          <button class="step" id="sWeigh"><span class="box" aria-hidden="true"></span>Weigh about 2 g of CaCO₃ in the weighing boat</button>
+          <button class="step" id="sStart"><span class="box" aria-hidden="true"></span>Lift the cotton, add the CaCO₃, replace the cotton, and start the timer</button>
+        </div>
+        <div class="btnrow">
+          <button class="btn" id="bStop" disabled>Stop the trial</button>
+          <button class="btn primary" id="bNew" disabled>Clean up for a new trial</button>
+        </div>
+        <div class="speed" role="group" aria-label="Simulation speed">
+          <span>Speed</span>
+          <button class="btn on" data-speed="1">1×</button>
+          <button class="btn" data-speed="5">5×</button>
+          <button class="btn" data-speed="20">20×</button>
+        </div>
+        <div class="status" id="status" role="status" aria-live="polite">Choose the acid concentration, then follow the steps.</div>
+      </div>
+
+      <div class="card">
+        <details>
+          <summary>Procedure</summary>
+          <ol>
+            <li>Choose the conditions for this trial.</li>
+            <li>Pour 25.0 mL of HCl into a clean flask on the balance. The balance reading includes the flask’s loose cotton plug.</li>
+            <li>Weigh about 2 g of CaCO₃ and record the exact mass.</li>
+            <li>Lift the cotton plug, add the CaCO₃, put the plug back loosely (it lets CO₂ out but keeps acid spray in), and start the timer.</li>
+            <li>The balance reading is recorded every 10 s for the first 2 minutes, then every 30 s, up to 10 minutes.</li>
+            <li>Copy the data table into your handout, then clean up and run the next trial.</li>
+          </ol>
+          <p class="note">Use the speed buttons to fast-forward long trials. Readings are still taken at the same simulated times.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <div class="lower">
+    <section class="card" aria-labelledby="chartTitle">
+      <h2 id="chartTitle">Balance reading vs. time</h2>
+      <p class="note" id="chartNote">The current trial is plotted as it runs.</p>
+      <svg id="chart" viewBox="0 0 440 260" aria-label="Graph of balance reading against time"></svg>
+    </section>
+    <section class="card" aria-labelledby="dataTitle">
+      <h2 id="dataTitle">Data table</h2>
+      <div class="trialbar">
+        <select id="selTrial" aria-label="Choose which trial to show"><option value="cur">Current trial</option></select>
+        <button class="btn" id="bCopy">Copy this table</button>
+        <button class="btn" id="bCopyAll">Copy all trials</button>
+        <button class="btn" id="bDel" disabled>Delete this trial</button>
+      </div>
+      <p class="note" id="trialInfo">No trial running yet.</p>
+      <textarea id="manualCopy" hidden readonly rows="6" aria-label="Data to copy" style="width:100%;font:inherit;margin-bottom:10px;padding:8px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)"></textarea>
+      <div class="tablewrap">
+        <table><thead><tr><th>Time (s)</th><th>Balance reading: flask + cotton + contents (g)</th></tr></thead><tbody id="logBody"></tbody></table>
+      </div>
+    </section>
+  </div>
+
+  <section class="card teacher" id="teacher" hidden aria-labelledby="tTitle">
+    <h2 id="tTitle">Teacher key</h2>
+    <p class="note">Shown only when the page address ends in #teacher.</p>
+    <div id="tOut"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var MM_CACO3 = 100.09, MM_CO2 = 44.01, R = 8.314;
+var K25 = 2.3e-5;          // mol CO2 per s per (mol/L H+), small chips, 2.00 g, 25 °C
+var EA = 30000;            // J/mol
+var SIZE = {large:0.45, small:1.0, powder:5.0};
+var SIZE_NAME = {large:"large chips", small:"small chips", powder:"powder"};
+var TAU = 2.0;             // s, CO2 escape lag from solution
+var LOG_TIMES = (function(){ var a=[]; for(var t=0;t<=120;t+=10)a.push(t); for(t=150;t<=600;t+=30)a.push(t); return a; })();
+
+var $ = function(id){return document.getElementById(id);};
+function rnd(a,b){return a+Math.random()*(b-a);}
+function say(t){$("status").textContent=t;}
+
+var S = { part:"A", speed:1, trials:[], cur:null, view:"cur" };
+
+function conditions(){
+  if (S.part==="A") return {conc:parseFloat($("selConc").value), size:"small", T:25};
+  return {conc:2.0, size:$("selSize").value, T:parseInt($("selTemp").value,10)};
+}
+function newTrial(){
+  var c = conditions();
+  S.cur = {part:S.part, conc:c.conc, size:c.size, T:c.T, V:25.0,
+    flask: Math.round(rnd(108,116)*1000)/1000,
+    acid:0, poured:false, weighed:false, started:false, running:false, done:false,
+    chip0:0, chip:0, H:0, dis:0, escaped:0, evap:0, t:0, log:[], nextLog:0,
+    var: c.size==="powder" ? rnd(0.97,1.03) : rnd(0.94,1.06),
+    bubbles:[] };
+}
+newTrial();
+
+/* ---------- physics ---------- */
+function kEff(tr){
+  var T = tr.T + 273.15;
+  return K25 * SIZE[tr.size] * tr.var * Math.exp(-EA/R*(1/T - 1/298.15));
+}
+function rateMol(tr){
+  if (tr.chip<=0 || tr.H<=0) return 0;
+  var area = Math.pow(tr.chip/2.00, 2/3);
+  var conc = tr.H/(tr.V/1000);
+  return kEff(tr)*area*conc;
+}
+function reading(tr){
+  var r = tr.flask + tr.acid + (tr.started ? tr.chip0 : 0) - tr.escaped - tr.evap;
+  if (tr.running) r += rnd(-0.0006,0.0006);
+  return r;
+}
+function step(tr, dt){
+  var n = rateMol(tr)*dt;
+  n = Math.min(n, tr.chip/MM_CACO3, tr.H/2);
+  tr.chip -= n*MM_CACO3; tr.H -= 2*n; tr.dis += n;
+  var out = tr.dis*(1-Math.exp(-dt/TAU)); tr.dis -= out; tr.escaped += out*MM_CO2;
+  tr.evap += Math.max(0, 0.000004*(tr.T-20))*dt;
+  tr.t += dt;
+}
+
+/* ---------- steps ---------- */
+function pour(){
+  var tr=S.cur; if (tr.poured) return;
+  var c=conditions(); tr.conc=c.conc; tr.size=c.size; tr.T=c.T;
+  tr.acid = 25.0*(1.000+0.017*tr.conc); tr.H = tr.conc*0.025; tr.poured=true;
+  say("25.0 mL of "+tr.conc.toFixed(1)+" M HCl is in the flask"+(tr.T>25?", warmed to "+tr.T+" °C in a water bath":"")+".");
+  update();
+}
+function weigh(){
+  var tr=S.cur; if (tr.weighed) return;
+  tr.chip0 = Math.round(rnd(1.950,2.050)*1000)/1000; tr.chip = tr.chip0; tr.weighed=true;
+  say("Record the exact mass of CaCO₃ shown on the weighing boat balance.");
+  update();
+}
+function start(){
+  var tr=S.cur; if (!tr.poured || !tr.weighed || tr.started) return;
+  tr.started=true; tr.running=true; tr.t=0; tr.nextLog=0;
+  logPoint(tr);
+  say("Reaction started. Watch the balance reading drop as CO₂ escapes.");
+  update();
+}
+function logPoint(tr){
+  var r = reading(tr);
+  tr.log.push({t:LOG_TIMES[tr.nextLog], m:Math.round(r*1000)/1000});
+  tr.nextLog++;
+}
+function stopTrial(){
+  var tr=S.cur; if (!tr.running) return;
+  tr.running=false; tr.done=true; saveTrial(tr);
+  say("Trial stopped and saved as Trial "+tr.id+". Copy its data, then clean up for the next trial.");
+  update();
+}
+function saveTrial(tr){
+  S.nextId = (S.nextId||0)+1; tr.id = S.nextId;   // trial numbers never change, even after a deletion
+  S.trials.push(tr);
+  var o=document.createElement("option"); o.value=String(tr.id);
+  o.textContent = "Trial "+tr.id+": "+describe(tr);
+  $("selTrial").appendChild(o);
+  $("countOut").textContent = S.trials.length;
+  renderTeacher();
+}
+function describe(tr){ return tr.conc.toFixed(1)+" M HCl, "+SIZE_NAME[tr.size]+", "+tr.T+" °C"; }
+function cleanUp(){
+  newTrial(); S.view="cur"; $("selTrial").value="cur"; $("bDel").disabled=true;
+  say(S.part==="A" ? "Clean flask on the balance. Choose the next concentration." : "Clean flask on the balance. Choose the next set of conditions.");
+  update(); renderLog(); renderChart();
+}
+
+/* ---------- UI state ---------- */
+function setStep(id, done, enabled){
+  var b=$(id); b.classList.toggle("done",!!done); b.disabled=!enabled||!!done;
+  b.querySelector(".box").textContent = done ? "✓" : "";
+}
+function update(){
+  var tr=S.cur, A=S.part==="A";
+  $("choiceA").hidden=!A; $("choiceB").hidden=A;
+  var lock = tr.poured;
+  $("selConc").disabled = lock; $("selSize").disabled = lock; $("selTemp").disabled = lock;
+  setStep("sPour", tr.poured, !tr.started);
+  setStep("sWeigh", tr.weighed, !tr.started);
+  setStep("sStart", tr.started, tr.poured && tr.weighed);
+  $("bStop").disabled = !tr.running;
+  $("bNew").disabled = !tr.done;
+  var c = tr.poured ? tr : conditions();
+  $("bottleLabel").textContent = c.conc.toFixed(1)+" M";
+  $("tempOut").textContent = c.T+" °C";
+}
+
+/* ---------- rendering ---------- */
+var levelY = 232;
+function renderRig(dt){
+  var tr=S.cur;
+  var r = reading(tr);
+  var main = tr.poured ? r : tr.flask;
+  $("lcdMain").textContent = main.toFixed(3)+" g"; $("mainOut").textContent = main.toFixed(3)+" g";
+  var boat = (tr.weighed && !tr.started) ? tr.chip0 : 0;
+  $("lcdBoat").textContent = boat.toFixed(3)+" g"; $("boatOut").textContent = boat.toFixed(3)+" g";
+  $("timerOut").textContent = tr.started ? Math.floor(tr.t)+" s" : "0 s";
+  // acid
+  var acid=$("acid");
+  if (tr.poured){ acid.setAttribute("y", levelY); acid.setAttribute("height", 270-levelY); } else acid.setAttribute("height",0);
+  $("cotton").setAttribute("opacity", 1);
+  // solid in flask or boat
+  var g = "", bg = "";
+  var frac = tr.chip0>0 ? Math.max(0, tr.chip/tr.chip0) : 1;
+  var drawSolid = function(cx, base, scale, inBoat){
+    var s="";
+    if (tr.size==="powder" || (!tr.poured && conditions().size==="powder" && inBoat)){
+      var n = inBoat ? 40 : Math.round(60*frac);
+      for (var i=0;i<n;i++){ var x = cx-34+((i*37)%68), y = base-((i*13)%(inBoat?7:9)); s += '<circle cx="'+x+'" cy="'+y+'" r="1.6" fill="#F2F0EA" stroke="#B9B5AA" stroke-width=".4"/>'; }
+      return s;
+    }
+    var size = inBoat ? (S.part==="A"?"small":conditions().size) : tr.size;
+    var pos = size==="large" ? [[-22,0],[2,-3],[24,1]] : [[-30,0],[-16,-2],[-3,1],[10,-1],[23,0],[-23,-8],[-8,-9],[7,-8],[18,-9]];
+    var rr = (size==="large"?11:6)*(inBoat?0.85:1)*Math.cbrt(frac);
+    if (rr<0.6) return s;
+    pos.forEach(function(p,i){ s += '<ellipse cx="'+(cx+p[0]*(inBoat?0.8:1))+'" cy="'+(base+p[1]-rr*0.7)+'" rx="'+rr.toFixed(2)+'" ry="'+(rr*0.75).toFixed(2)+'" fill="'+(i%2?"#EDEAE3":"#E2DED5")+'" stroke="#A9A499" stroke-width=".7"/>'; });
+    return s;
+  };
+  if (tr.started) g = drawSolid(260, 268, 1, false);
+  if (tr.weighed && !tr.started) bg = drawSolid(450, 278, 1, true);
+  $("solid").innerHTML = g; $("boatSolid").innerHTML = bg;
+  // bubbles
+  var rate = tr.running ? rateMol(tr) : 0;
+  if (tr.running){
+    var expected = rate/2.5e-6 * dt;
+    while (expected > 0){ if (Math.random() < Math.min(1,expected)) tr.bubbles.push({x:rnd(200,320), y:rnd(255,266), r:rnd(1.2,3), v:rnd(40,80)}); expected -= 1; }
+    if (tr.bubbles.length>160) tr.bubbles.splice(0, tr.bubbles.length-160);
+  }
+  var bs="", keep=[];
+  tr.bubbles.forEach(function(b){ b.y -= b.v*dt; b.x += Math.sin(b.y/7)*0.4; if (b.y > levelY+1){ keep.push(b); bs += '<circle cx="'+b.x.toFixed(1)+'" cy="'+b.y.toFixed(1)+'" r="'+b.r.toFixed(1)+'" fill="rgba(255,255,255,.35)" stroke="rgba(70,110,130,.6)" stroke-width=".8"/>'; } });
+  tr.bubbles = keep; $("bubbles").innerHTML = bs;
+  var foamH = Math.min(14, rate/1e-5*1.4);
+  var foam=$("foam"); foam.setAttribute("y", levelY-foamH*0.3); foam.setAttribute("height", foamH); foam.setAttribute("opacity", foamH>1 ? 0.7 : 0);
+}
+
+function currentView(){
+  if (S.view==="cur") return S.cur;
+  var id=parseInt(S.view,10);
+  for (var i=0;i<S.trials.length;i++) if (S.trials[i].id===id) return S.trials[i];
+  return S.cur;
+}
+var lastLogLen = -1, lastView = null;
+function renderLog(){
+  var tr = currentView();
+  var body=$("logBody");
+  if (!tr || !tr.started){ body.innerHTML=""; $("trialInfo").textContent = "No trial running yet."; return; }
+  $("trialInfo").textContent = describe(tr)+". Mass of CaCO₃: "+tr.chip0.toFixed(3)+" g. Balance readings include the flask, cotton plug, acid, and CaCO₃.";
+  var h=""; tr.log.forEach(function(p){ h += "<tr><td>"+p.t+"</td><td>"+p.m.toFixed(3)+"</td></tr>"; });
+  body.innerHTML = h;
+}
+function renderChart(){
+  var tr = currentView(), z=$("chart"), s="";
+  var X0=56, X1=428, Y0=20, Y1=220;
+  var tmax=600;
+  var m0 = tr && tr.started ? tr.log[0].m : 0;
+  var top = m0+0.05, bot = m0-1.0;
+  for (var t=0;t<=600;t+=100){ var x=X0+(t/tmax)*(X1-X0); s+='<line class="gridline" x1="'+x+'" x2="'+x+'" y1="'+Y0+'" y2="'+Y1+'"/><text class="axlabel" x="'+x+'" y="'+(Y1+16)+'" text-anchor="middle">'+t+'</text>'; }
+  for (var i=0;i<=5;i++){ var v=bot+(top-bot)*i/5, y=Y1-(i/5)*(Y1-Y0); s+='<line class="gridline" x1="'+X0+'" x2="'+X1+'" y1="'+y+'" y2="'+y+'"/>'; if(tr&&tr.started) s+='<text class="axlabel" x="'+(X0-6)+'" y="'+(y+4)+'" text-anchor="end">'+v.toFixed(2)+'</text>'; }
+  s+='<line class="axis" x1="'+X0+'" x2="'+X1+'" y1="'+Y1+'" y2="'+Y1+'"/><line class="axis" x1="'+X0+'" x2="'+X0+'" y1="'+Y0+'" y2="'+Y1+'"/>';
+  s+='<text class="axlabel" x="'+((X0+X1)/2)+'" y="'+(Y1+34)+'" text-anchor="middle">Time (s)</text>';
+  s+='<text class="axlabel" transform="translate(14 '+((Y0+Y1)/2)+') rotate(-90)" text-anchor="middle">Balance reading (g)</text>';
+  if (tr && tr.started && tr.log.length){
+    var pts = tr.log.map(function(p){ return [X0+(p.t/tmax)*(X1-X0), Y1-((p.m-bot)/(top-bot))*(Y1-Y0)]; });
+    s+='<polyline fill="none" stroke="var(--plot)" stroke-width="2" points="'+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" ")+'"/>';
+    pts.forEach(function(p){ s+='<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="2.6" fill="var(--plot)"/>'; });
+  }
+  z.innerHTML = s;
+}
+
+/* ---------- copy ---------- */
+function tableText(tr, idx){
+  var lines = ["Trial "+idx+": "+describe(tr)+"; mass CaCO3 = "+tr.chip0.toFixed(3)+" g", "Time (s)\tBalance reading: flask + cotton + contents (g)"];
+  tr.log.forEach(function(p){ lines.push(p.t+"\t"+p.m.toFixed(3)); });
+  return lines.join("\n");
+}
+function textToHTML(text){
+  return text.split("\n\n").map(function(block){
+    var lines = block.split("\n");
+    var h = "<p><b>"+lines[0]+"</b></p><table border=\"1\" cellpadding=\"4\" style=\"border-collapse:collapse\">";
+    lines.slice(1).forEach(function(l,i){
+      var tag = i===0 ? "th" : "td";
+      h += "<tr>"+l.split("\t").map(function(c){ return "<"+tag+">"+c+"</"+tag+">"; }).join("")+"</tr>";
+    });
+    return h + "</table>";
+  }).join("<p></p>");
+}
+function showManual(text){
+  var ta = $("manualCopy"); ta.hidden = false; ta.value = text; ta.focus(); ta.select();
+  say("This browser blocked automatic copying. The data is selected in the box under the data table; press Ctrl+C (⌘C on a Mac) to copy it.");
+}
+function copy(text){
+  var ok = false;
+  // copy a real HTML table so it pastes as a table in Word, Google Docs, Excel, and Sheets
+  try {
+    var box = document.createElement("div");
+    box.style.cssText = "position:fixed;left:-9999px;top:0;color:#000;background:#fff;font-family:Calibri,Arial,sans-serif;font-size:11pt;";
+    box.innerHTML = textToHTML(text);
+    document.body.appendChild(box);
+    var range = document.createRange(); range.selectNodeContents(box);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    ok = document.execCommand("copy");
+    sel.removeAllRanges(); document.body.removeChild(box);
+  } catch(e){ ok = false; }
+  if (ok){ $("manualCopy").hidden = true; say("Copied as a table. Paste it into Word, Google Docs, Excel, or Google Sheets."); return; }
+  try { navigator.clipboard.writeText(text).then(function(){ say("Copied. Paste it into a spreadsheet or document."); }, function(){ showManual(text); }); }
+  catch(e){ showManual(text); }
+}
+
+/* ---------- teacher ---------- */
+function renderTeacher(){
+  if ($("teacher").hidden) return;
+  var row=function(label, tr){ var r=kEff(tr)*Math.pow(1,2/3)*tr.conc*MM_CO2; return "<tr><td>"+label+"</td><td>"+r.toFixed(4)+" g/s</td></tr>"; };
+  var base={T:25,size:"small",var:1,conc:2};
+  var h = "<p>Model: rate = k·(surface factor)·[H⁺]¹, so the reaction is <strong>first order in H⁺</strong>. k (small chips, 2.00 g, 25 °C) = "+K25.toExponential(2)+" mol CO₂·s⁻¹·M⁻¹ = "+(K25*MM_CO2).toFixed(5)+" g CO₂·s⁻¹·M⁻¹. Surface factors: large 0.45, small 1.0, powder 5.0. Activation energy 30 kJ/mol (rate ×1.48 at 35 °C, ×2.14 at 45 °C). Each chip trial varies randomly by ±6% to mimic real chips; balance noise is ±0.001 g; water evaporation adds a small extra mass loss that grows with temperature.</p>";
+  h += "<table><thead><tr><th>Condition (2.00 g CaCO₃)</th><th>Expected initial rate</th></tr></thead><tbody>";
+  [1,2,3,4].forEach(function(c){ h += row(c.toFixed(1)+" M, small chips, 25 °C", {T:25,size:"small",var:1,conc:c}); });
+  h += row("2.0 M, large chips, 25 °C", {T:25,size:"large",var:1,conc:2});
+  h += row("2.0 M, powder, 25 °C", {T:25,size:"powder",var:1,conc:2});
+  h += row("2.0 M, small chips, 35 °C", {T:35,size:"small",var:1,conc:2});
+  h += row("2.0 M, small chips, 45 °C", {T:45,size:"small",var:1,conc:2});
+  h += "</tbody></table><p class='note'>Measured slopes over 0–30 s run a few percent lower than these because CO₂ takes a couple of seconds to leave the solution. The final mass loss at 1.0 M is limited by the acid (theoretical 0.550 g CO₂); at 2.0 M and above the CaCO₃ is limiting (about 0.88 g CO₂ for 2.00 g).</p>";
+  if (S.trials.length){
+    h += "<h3 style='font-size:1rem;margin-top:10px'>This session’s trials (true random factor)</h3><ul>";
+    S.trials.forEach(function(tr){ h += "<li>Trial "+tr.id+": "+describe(tr)+", chip factor "+tr.var.toFixed(3)+"</li>"; });
+    h += "</ul>";
+  }
+  $("tOut").innerHTML = h;
+}
+function checkHash(){ $("teacher").hidden = location.hash!=="#teacher"; renderTeacher(); }
+
+/* ---------- events ---------- */
+$("tabA").onclick = $("tabB").onclick = function(){
+  var tr=S.cur;
+  if (tr.running){ say("Finish or stop the current trial before switching parts."); return; }
+  S.part = this.getAttribute("data-part");
+  $("tabA").setAttribute("aria-selected", S.part==="A"); $("tabB").setAttribute("aria-selected", S.part==="B");
+  if (!tr.started){ newTrial(); }
+  say(S.part==="A" ? "Part A: vary the HCl concentration with everything else held constant." : "Part B: run the standard trial, then change only the CaCO₃ form or only the temperature.");
+  update();
+};
+["selConc","selSize","selTemp"].forEach(function(id){ $(id).onchange = function(){ if(!S.cur.poured){ var c=conditions(); S.cur.conc=c.conc; S.cur.size=c.size; S.cur.T=c.T; } update(); }; });
+$("sPour").onclick = pour; $("sWeigh").onclick = weigh; $("sStart").onclick = start;
+$("bStop").onclick = stopTrial; $("bNew").onclick = cleanUp;
+document.querySelectorAll("[data-speed]").forEach(function(b){ b.onclick=function(){ S.speed=parseInt(b.getAttribute("data-speed"),10); document.querySelectorAll("[data-speed]").forEach(function(o){o.classList.toggle("on", o===b);}); }; });
+$("selTrial").onchange = function(){ S.view = this.value; $("bDel").disabled = (this.value==="cur"); disarmDelete(); lastLogLen=-1; renderLog(); renderChart(); };
+$("bCopy").onclick = function(){ var tr=currentView(); if(!tr||!tr.started){ say("There’s no data to copy yet."); return; } var idx = S.view==="cur" ? (S.cur.done ? S.cur.id : "in progress") : S.view; copy(tableText(tr, idx)); };
+$("bCopyAll").onclick = function(){ if(!S.trials.length){ say("Save at least one trial first."); return; } copy(S.trials.map(function(tr){ return tableText(tr,tr.id); }).join("\n\n")); };
+var delArmed=false, delTimer=0;
+function disarmDelete(){ clearTimeout(delTimer); delArmed=false; $("bDel").textContent="Delete this trial"; }
+$("bDel").onclick = function(){
+  if (S.view==="cur") return;
+  if (!delArmed){
+    delArmed=true; this.textContent="Click again to delete";
+    clearTimeout(delTimer); delTimer=setTimeout(disarmDelete, 3000);
+    return;
+  }
+  disarmDelete();
+  var id=parseInt(S.view,10), gone=null;
+  S.trials = S.trials.filter(function(t){ if(t.id===id){ gone=t; return false; } return true; });
+  var opt=$("selTrial").querySelector('option[value="'+id+'"]'); if (opt) opt.remove();
+  $("countOut").textContent = S.trials.length;
+  if (gone===S.cur){ cleanUp(); }
+  else { S.view="cur"; $("selTrial").value="cur"; this.disabled=true; lastLogLen=-1; renderLog(); renderChart(); }
+  say("Trial "+id+" was deleted. The remaining trials keep their numbers.");
+  renderTeacher();
+};
+window.addEventListener("hashchange", checkHash);
+
+/* ---------- loop ---------- */
+var last = performance.now();
+function loop(now){
+  var dt = Math.min(0.1,(now-last)/1000); last=now;
+  var tr=S.cur;
+  if (tr.running){
+    var simDt = dt*S.speed, sub = Math.max(1, Math.ceil(simDt/0.05)), h = simDt/sub;
+    for (var i=0;i<sub;i++){
+      step(tr,h);
+      while (tr.nextLog < LOG_TIMES.length && tr.t >= LOG_TIMES[tr.nextLog]) logPoint(tr);
+      if (tr.nextLog >= LOG_TIMES.length){ tr.running=false; tr.done=true; saveTrial(tr); say("10 minutes are up. The trial was saved as Trial "+tr.id+". Copy its data, then clean up for the next trial."); update(); break; }
+    }
+  }
+  renderRig(dt*Math.min(S.speed,5));
+  var v=currentView();
+  if (v && (v.log.length!==lastLogLen || lastView!==S.view)){ lastLogLen=v.log.length; lastView=S.view; renderLog(); renderChart(); }
+  requestAnimationFrame(loop);
+}
+update(); renderChart(); checkHash();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
